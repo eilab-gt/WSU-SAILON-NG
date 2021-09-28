@@ -26,8 +26,13 @@ import queue
 import random
 import threading
 import time
+import random
+import torch
+import numpy as np
 
+from stable_baselines3.a2c import A2C
 from objects.TA2_logic import TA2Logic
+import objects.vizdoom as vizdoom
 
 
 class ThreadedProcessingExample(threading.Thread):
@@ -63,7 +68,8 @@ class TA2Agent(TA2Logic):
     def __init__(self):
         super().__init__()
 
-        self.possible_answers = list()
+        self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'}, {'action': 'forward'}, {
+            'action': 'backward'}, {'action': 'shoot'}, {'action': 'turn_left'}, {'action': 'turn_right'}]
         # This variable can be set to true and the system will attempt to end training at the
         # completion of the current episode, or sooner if possible.
         self.end_training_early = False
@@ -71,7 +77,20 @@ class TA2Agent(TA2Logic):
         # will attempt to cleanly end the experiment at the conclusion of the current episode,
         # or sooner if possible.
         self.end_experiment_early = False
+        self.seed = None
+        self.last_state = None
+        self.last_action = None
+        self.states = []
+        self.rewards = []
+        self.dones = []
+        self.env = vizdoom.VizDoomEnv()
+        self.model = A2C('MlpPolicy', self.env, n_steps=2000)
         return
+
+    def random_seed(self, seed):
+        random.seed(seed)
+        torch.manual_seed(seed)
+        np.random.seed(seed)
 
     def experiment_start(self):
         """This function is called when this TA2 has connected to a TA1 and is ready to begin
@@ -90,18 +109,18 @@ class TA2Agent(TA2Logic):
     def training_episode_start(self, episode_number: int):
         """This function is called at the start of each training episode, with the current episode
         number (0-based) that you are about to begin.
-
         Parameters
         ----------
         episode_number : int
             This identifies the 0-based episode number you are about to begin training on.
         """
+        self.seed = random.randint(0, 1e9)
+        self.random_seed(self.seed)
         self.log.info('Training Episode Start: #{}'.format(episode_number))
         return
 
     def training_instance(self, feature_vector: dict, feature_label: dict) -> dict:
         """Process a training
-
         Parameters
         ----------
         feature_vector : dict
@@ -112,25 +131,25 @@ class TA2Agent(TA2Logic):
             are defined on the github (https://github.com/holderlb/WSU-SAILON-NG). This will always
             be in the format of {'action': label}.  Some domains that do not need an 'oracle' label
             on training data will receive a valid action chosen at random.
-
         Returns
         -------
         dict
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
-        self.log.debug('Training Instance: feature_vector={}  feature_label={}'.format(
-            feature_vector, feature_label))
-        if feature_label not in self.possible_answers:
-            self.possible_answers.append(copy.deepcopy(feature_label))
-
-        label_prediction = random.choice(self.possible_answers)
-
+        if self.last_state:
+            reward = vizdoom.compute_reward(self.last_state, self.last_action, feature_vector)
+            self.rewards.append(reward)
+        state = vizdoom.vectorize_state(feature_vector)
+        action, _ = self.model.predict(state)
+        label_prediction = self.possible_answers[action]
+        self.last_state = feature_vector
+        self.last_action = label_prediction['action']
+        self.states.append(state)
         return label_prediction
 
     def training_performance(self, performance: float, feedback: dict = None):
         """Provides the current performance on training after each instance.
-
         Parameters
         ----------
         performance : float
@@ -139,14 +158,14 @@ class TA2Agent(TA2Logic):
             A dictionary that may provide additional feedback on your prediction based on the
             budget set in the TA1. If there is no feedback, the object will be None.
         """
-        self.log.debug('Training Performance: {}'.format(performance))
+        self.dones.append(False)
+        # self.log.debug('Training Performance: {}'.format(performance))
         return
 
     def training_episode_end(self, performance: float, feedback: dict = None) -> \
             (float, float, int, dict):
         """Provides the final performance on the training episode and indicates that the training
         episode has ended.
-
         Parameters
         ----------
         performance : float
@@ -154,7 +173,6 @@ class TA2Agent(TA2Logic):
         feedback : dict, optional
             A dictionary that may provide additional feedback on your prediction based on the
             budget set in the TA1. If there is no feedback, the object will be None.
-
         Returns
         -------
         float, float, int, dict
@@ -163,7 +181,20 @@ class TA2Agent(TA2Logic):
             Integer representing the predicted novelty level.
             A JSON-valid dict characterizing the novelty.
         """
-        self.log.info('Training Episode End: performance={}'.format(performance))
+        self.states.append(self.states[-1])
+        self.rewards.append(50 + 50 * performance if performance else -100)
+        self.dones.append(True)
+
+        self.log.info(
+            f'states={len(self.states)} reward={sum(self.rewards)} performance={performance}')
+
+        self.random_seed(self.seed)
+        self.env.load_trajectory(self.states, self.rewards, self.dones)
+        self.model.learn(total_timesteps=len(self.states) - 1)
+
+        self.states = []
+        self.rewards = []
+        self.dones = []
 
         novelty_probability = random.random()
         novelty_threshold = 0.8
@@ -183,8 +214,6 @@ class TA2Agent(TA2Logic):
         empty.  After this completes, the logic calls save_model() and reset_model() as needed
         throughout the rest of the experiment.
         """
-        self.log.info('Train the model here if needed.')
-
         # Simulate training the model by sleeping.
         self.log.info('Simulating training with a 5 second sleep.')
         time.sleep(5)
@@ -193,18 +222,17 @@ class TA2Agent(TA2Logic):
 
     def save_model(self, filename: str):
         """Saves the current model in memory to disk so it may be loaded back to memory again.
-
         Parameters
         ----------
         filename : str
             The filename to save the model to.
         """
         self.log.info('Save model to disk.')
+        self.model.save(filename)
         return
 
     def reset_model(self, filename: str):
         """Loads the model from disk to memory.
-
         Parameters
         ----------
         filename : str
@@ -215,7 +243,6 @@ class TA2Agent(TA2Logic):
 
     def trial_start(self, trial_number: int, novelty_description: dict):
         """This is called at the start of a trial with the current 0-based number.
-
         Parameters
         ----------
         trial_number : int
@@ -239,7 +266,6 @@ class TA2Agent(TA2Logic):
     def testing_episode_start(self, episode_number: int):
         """This is called at the start of each testing episode in a trial, you are provided the
         0-based episode number.
-
         Parameters
         ----------
         episode_number : int
@@ -284,7 +310,6 @@ class TA2Agent(TA2Logic):
     def testing_instance(self, feature_vector: dict, novelty_indicator: bool = None) -> dict:
         """Evaluate a testing instance.  Returns the predicted label or action, if you believe
         this episode is novel, and what novelty level you beleive it to be.
-
         Parameters
         ----------
         feature_vector : dict
@@ -295,15 +320,14 @@ class TA2Agent(TA2Logic):
                 - True == novelty has been introduced.
                 - False == novelty has not been introduced.
                 - None == no information about novelty is being provided.
-
         Returns
         -------
         dict
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
-        self.log.debug('Testing Instance: feature_vector={}, novelty_indicator={}'.format(
-            feature_vector, novelty_indicator))
+        # self.log.debug('Testing Instance: feature_vector={}, novelty_indicator={}'.format(
+        #     feature_vector, novelty_indicator))
 
         # Return dummy random choices, but should be determined by trained model
         label_prediction = random.choice(self.possible_answers)
@@ -312,7 +336,6 @@ class TA2Agent(TA2Logic):
 
     def testing_performance(self, performance: float, feedback: dict = None):
         """Provides the current performance on training after each instance.
-
         Parameters
         ----------
         performance : float
@@ -327,7 +350,6 @@ class TA2Agent(TA2Logic):
     def testing_episode_end(self, performance: float, feedback: dict = None) -> \
             (float, float, int, dict):
         """Provides the final performance on the testing episode.
-
         Parameters
         ----------
         performance : float
@@ -335,7 +357,6 @@ class TA2Agent(TA2Logic):
         feedback : dict, optional
             A dictionary that may provide additional feedback on your prediction based on the
             budget set in the TA1. If there is no feedback, the object will be None.
-
         Returns
         -------
         float, float, int, dict
@@ -344,7 +365,8 @@ class TA2Agent(TA2Logic):
             Integer representing the predicted novelty level.
             A JSON-valid dict characterizing the novelty.
         """
-        self.log.info('Testing Episode End: performance={}'.format(performance))
+        self.log.info(
+            'Testing Episode End: performance={}'.format(performance))
 
         novelty_probability = random.random()
         novelty_threshold = 0.8
