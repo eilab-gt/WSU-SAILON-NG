@@ -40,7 +40,7 @@ def vectorize_state(state):
 def compute_reward(state, action, next_state):
     player = state['player']
     if len(state['enemies']) > len(next_state['enemies']):
-        return 1
+        return len(state['enemies']) - len(next_state['enemies'])
     elif action == 'shoot':
         for i in range(len(state['enemies'])):
             enemy = state['enemies'][i]
