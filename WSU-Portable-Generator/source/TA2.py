@@ -147,7 +147,7 @@ class TA2Agent(TA2Logic):
         """
         # pass feature_vector to state queue so env can return it on reset()/step()
         self.state_queue.put(feature_vector)
-        # retrieve agent's action from step() call
+        # retrieve agent's action from env.step() call
         action = self.action_queue.get()
         label_prediction = self.possible_answers[action]
         return label_prediction

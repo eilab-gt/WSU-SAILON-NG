@@ -26,7 +26,7 @@ class VizDoomEnv(gym.Env):
         # if in the middle of timesteps use last state o/w grab state from TA2
         self.last_state_dict = self.last_state_dict or self.state_queue.get()
         # checks whether training has ended
-        if self.last_state_dict is {}:
+        if self.last_state_dict == {}:
             raise RuntimeError()
         state = vectorize_state(self.last_state_dict)
         self.log.debug('Resetting State')
@@ -38,7 +38,7 @@ class VizDoomEnv(gym.Env):
         # grabs next state from TA2
         next_state_dict = self.state_queue.get()
         # checks whether training has ended
-        if next_state_dict is {}:
+        if next_state_dict == {}:
             raise RuntimeError()
         # if next state is None, uses last state
         next_state_dict = next_state_dict or self.last_state_dict
@@ -48,6 +48,7 @@ class VizDoomEnv(gym.Env):
         performance = self.performance_queue.get()
         reward = (5 if performance else -5) if done else (len(
             self.last_state_dict['enemies']) - len(next_state_dict['enemies']))
+        # increment logging variables
         self.step_count += 1
         self.total_reward += reward
         # force reset() to grab a state from TA2 if episode has concluded
@@ -55,7 +56,7 @@ class VizDoomEnv(gym.Env):
         self.last_state_dict = None if done else next_state_dict
         if done:
             # log total reward accumulated during episode
-            self.log.info(f'Training Episode End: reward={self.total_reward} steps={self.step}')
+            self.log.info(f'Training Episode End: reward={self.total_reward} steps={self.step_count}')
             wandb.log({'reward': self.total_reward})
         return next_state, reward, done, {}
 
