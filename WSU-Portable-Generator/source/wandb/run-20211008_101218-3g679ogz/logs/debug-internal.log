@@ -1,0 +1,194 @@
+2021-10-08 10:12:18,590 INFO    MainThread:3228433 [internal.py:wandb_internal():89] W&B internal server running at pid: 3228433, started at: 2021-10-08 10:12:18.590412
+2021-10-08 10:12:18,591 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: check_version
+2021-10-08 10:12:18,591 INFO    WriterThread:3228433 [datastore.py:open_for_write():77] open: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/run-3g679ogz.wandb
+2021-10-08 10:12:18,593 DEBUG   SenderThread:3228433 [sender.py:send():185] send: header
+2021-10-08 10:12:18,593 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: check_version
+2021-10-08 10:12:18,694 DEBUG   SenderThread:3228433 [sender.py:send():185] send: run
+2021-10-08 10:12:18,778 INFO    SenderThread:3228433 [dir_watcher.py:__init__():169] watching files in: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files
+2021-10-08 10:12:18,778 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: run_start
+2021-10-08 10:12:18,778 INFO    SenderThread:3228433 [sender.py:_start_run_threads():749] run started: 3g679ogz with start time 1633702338
+2021-10-08 10:12:18,779 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:12:18,779 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:12:18,782 DEBUG   HandlerThread:3228433 [meta.py:__init__():40] meta init
+2021-10-08 10:12:18,782 DEBUG   HandlerThread:3228433 [meta.py:__init__():54] meta init done
+2021-10-08 10:12:18,782 DEBUG   HandlerThread:3228433 [meta.py:probe():211] probe
+2021-10-08 10:12:18,788 DEBUG   HandlerThread:3228433 [meta.py:_setup_git():201] setup git
+2021-10-08 10:12:18,795 DEBUG   HandlerThread:3228433 [meta.py:_setup_git():208] setup git done
+2021-10-08 10:12:18,795 DEBUG   HandlerThread:3228433 [meta.py:_save_pip():58] save pip
+2021-10-08 10:12:18,796 DEBUG   HandlerThread:3228433 [meta.py:_save_pip():72] save pip done
+2021-10-08 10:12:18,796 DEBUG   HandlerThread:3228433 [meta.py:_save_conda():79] save conda
+2021-10-08 10:12:19,399 DEBUG   HandlerThread:3228433 [meta.py:_save_conda():87] save conda done
+2021-10-08 10:12:19,399 DEBUG   HandlerThread:3228433 [meta.py:probe():249] probe done
+2021-10-08 10:12:19,420 DEBUG   SenderThread:3228433 [sender.py:send():185] send: files
+2021-10-08 10:12:19,420 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-metadata.json with policy now
+2021-10-08 10:12:19,426 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:12:19,426 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:12:19,482 DEBUG   SenderThread:3228433 [sender.py:send():185] send: config
+2021-10-08 10:12:19,482 DEBUG   SenderThread:3228433 [sender.py:send():185] send: config
+2021-10-08 10:12:19,753 INFO    Thread-11 :3228433 [upload_job.py:push():137] Uploaded file /tmp/tmpvecu43fswandb/14fehtr4-wandb-metadata.json
+2021-10-08 10:12:19,780 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-metadata.json
+2021-10-08 10:12:19,780 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/requirements.txt
+2021-10-08 10:12:19,781 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/conda-environment.yaml
+2021-10-08 10:12:19,781 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:12:19,781 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:12:21,779 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:12:23,538 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:12:23,538 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:12:23,541 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:12:23,779 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:12:25,780 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:12:34,483 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:12:34,483 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:12:38,904 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:12:38,904 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:12:38,906 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:12:39,784 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:12:39,784 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:12:41,784 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:12:47,071 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:12:49,540 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:12:49,540 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:12:49,786 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/config.yaml
+2021-10-08 10:13:04,597 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:13:04,597 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:13:17,359 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:13:18,387 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:13:18,387 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:13:18,388 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:13:18,794 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:13:19,655 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:13:19,655 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:13:19,794 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:13:21,795 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:13:29,256 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:13:29,257 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:13:29,259 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:13:29,797 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:13:31,798 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:13:34,716 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:13:34,716 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:13:47,691 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:13:49,775 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:13:49,776 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:14:04,833 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:14:04,834 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:14:17,956 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:14:19,888 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:14:19,889 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:14:34,948 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:14:34,948 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:14:41,864 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:14:41,865 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:14:41,867 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:14:42,820 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:14:43,820 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:14:47,761 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:14:47,762 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:14:47,762 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:14:47,821 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:14:48,331 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:14:49,822 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:14:50,010 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:14:50,011 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:14:54,252 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:14:54,253 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:14:54,255 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:14:54,824 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:14:55,824 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:15:05,074 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:15:05,075 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:15:18,565 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:15:20,138 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:15:20,139 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:15:34,450 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:15:34,450 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:15:34,453 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:15:34,834 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:15:35,198 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:15:35,198 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:15:35,834 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:15:48,871 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:15:50,255 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:15:50,255 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:15:55,840 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:16:05,315 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:16:05,316 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:16:14,651 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:16:14,651 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:16:14,654 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:16:14,845 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:16:15,846 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:16:19,213 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:16:20,375 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:16:20,375 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:16:28,723 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:16:28,724 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:16:28,727 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:16:28,850 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:16:29,851 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:16:33,107 DEBUG   SenderThread:3228433 [sender.py:send():185] send: history
+2021-10-08 10:16:33,107 DEBUG   SenderThread:3228433 [sender.py:send():185] send: summary
+2021-10-08 10:16:33,108 INFO    SenderThread:3228433 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:16:33,852 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:16:33,852 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:16:35,434 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:16:35,434 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:16:35,852 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:16:49,456 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:16:50,489 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:16:50,489 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:17:05,549 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:17:05,549 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:17:19,752 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:17:20,668 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:17:20,668 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:17:29,872 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:31,872 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:33,874 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:35,728 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:17:35,728 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:17:35,875 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:37,876 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:39,877 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:41,878 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:43,879 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:45,880 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:47,881 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:49,882 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:50,146 DEBUG   SenderThread:3228433 [sender.py:send():185] send: stats
+2021-10-08 10:17:50,786 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:17:50,786 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:17:51,883 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:53,884 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:55,885 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:57,886 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:17:59,887 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:18:01,888 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:18:03,889 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:18:05,844 DEBUG   HandlerThread:3228433 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:18:05,845 DEBUG   SenderThread:3228433 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:18:05,890 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:18:07,891 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:18:09,892 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:18:11,894 INFO    Thread-8  :3228433 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:18:12,615 WARNING MainThread:3228433 [internal.py:wandb_internal():145] Internal process interrupt: 1
+2021-10-08 10:18:12,962 WARNING MainThread:3228433 [internal.py:wandb_internal():145] Internal process interrupt: 2
+2021-10-08 10:18:12,962 ERROR   MainThread:3228433 [internal.py:wandb_internal():148] Internal process interrupted.
+2021-10-08 10:18:13,800 INFO    WriterThread:3228433 [datastore.py:close():281] close: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/run-3g679ogz.wandb
+2021-10-08 10:18:13,800 INFO    SenderThread:3228433 [sender.py:finish():986] shutting down sender
+2021-10-08 10:18:13,800 INFO    SenderThread:3228433 [dir_watcher.py:finish():283] shutting down directory watcher
+2021-10-08 10:18:13,895 INFO    SenderThread:3228433 [dir_watcher.py:finish():313] scan: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files
+2021-10-08 10:18:13,895 INFO    SenderThread:3228433 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/requirements.txt requirements.txt
+2021-10-08 10:18:13,895 INFO    SenderThread:3228433 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/conda-environment.yaml conda-environment.yaml
+2021-10-08 10:18:13,895 INFO    SenderThread:3228433 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/config.yaml config.yaml
+2021-10-08 10:18:13,896 INFO    SenderThread:3228433 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-metadata.json wandb-metadata.json
+2021-10-08 10:18:13,903 INFO    SenderThread:3228433 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json wandb-summary.json
+2021-10-08 10:18:13,903 INFO    SenderThread:3228433 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log output.log
+2021-10-08 10:18:13,903 INFO    SenderThread:3228433 [file_pusher.py:finish():177] shutting down file pusher
+2021-10-08 10:18:13,904 INFO    SenderThread:3228433 [file_pusher.py:join():182] waiting for file pusher
+2021-10-08 10:18:14,184 INFO    Thread-15 :3228433 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/wandb-summary.json
+2021-10-08 10:18:14,189 INFO    Thread-12 :3228433 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/requirements.txt
+2021-10-08 10:18:14,191 INFO    Thread-16 :3228433 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/output.log
+2021-10-08 10:18:14,237 INFO    Thread-14 :3228433 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/config.yaml
+2021-10-08 10:18:14,239 INFO    Thread-13 :3228433 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_101218-3g679ogz/files/conda-environment.yaml
+2021-10-08 10:18:15,043 INFO    MainThread:3228433 [internal.py:handle_exit():76] Internal process exited

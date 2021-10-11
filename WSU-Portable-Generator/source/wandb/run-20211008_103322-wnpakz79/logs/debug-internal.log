@@ -1,0 +1,56 @@
+2021-10-08 10:33:22,734 INFO    MainThread:3239282 [internal.py:wandb_internal():89] W&B internal server running at pid: 3239282, started at: 2021-10-08 10:33:22.734467
+2021-10-08 10:33:22,735 DEBUG   HandlerThread:3239282 [handler.py:handle_request():126] handle_request: check_version
+2021-10-08 10:33:22,735 INFO    WriterThread:3239282 [datastore.py:open_for_write():77] open: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/run-wnpakz79.wandb
+2021-10-08 10:33:22,737 DEBUG   SenderThread:3239282 [sender.py:send():185] send: header
+2021-10-08 10:33:22,737 DEBUG   SenderThread:3239282 [sender.py:send_request():199] send_request: check_version
+2021-10-08 10:33:22,831 DEBUG   SenderThread:3239282 [sender.py:send():185] send: run
+2021-10-08 10:33:22,954 INFO    SenderThread:3239282 [dir_watcher.py:__init__():169] watching files in: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files
+2021-10-08 10:33:22,954 DEBUG   HandlerThread:3239282 [handler.py:handle_request():126] handle_request: run_start
+2021-10-08 10:33:22,954 INFO    SenderThread:3239282 [sender.py:_start_run_threads():749] run started: wnpakz79 with start time 1633703602
+2021-10-08 10:33:22,954 DEBUG   SenderThread:3239282 [sender.py:send():185] send: summary
+2021-10-08 10:33:22,955 INFO    SenderThread:3239282 [sender.py:_save_file():879] saving file wandb-summary.json with policy end
+2021-10-08 10:33:22,957 DEBUG   HandlerThread:3239282 [meta.py:__init__():40] meta init
+2021-10-08 10:33:22,957 DEBUG   HandlerThread:3239282 [meta.py:__init__():54] meta init done
+2021-10-08 10:33:22,957 DEBUG   HandlerThread:3239282 [meta.py:probe():211] probe
+2021-10-08 10:33:22,963 DEBUG   HandlerThread:3239282 [meta.py:_setup_git():201] setup git
+2021-10-08 10:33:22,970 DEBUG   HandlerThread:3239282 [meta.py:_setup_git():208] setup git done
+2021-10-08 10:33:22,970 DEBUG   HandlerThread:3239282 [meta.py:_save_pip():58] save pip
+2021-10-08 10:33:22,970 DEBUG   HandlerThread:3239282 [meta.py:_save_pip():72] save pip done
+2021-10-08 10:33:22,970 DEBUG   HandlerThread:3239282 [meta.py:_save_conda():79] save conda
+2021-10-08 10:33:23,594 DEBUG   HandlerThread:3239282 [meta.py:_save_conda():87] save conda done
+2021-10-08 10:33:23,594 DEBUG   HandlerThread:3239282 [meta.py:probe():249] probe done
+2021-10-08 10:33:23,613 DEBUG   SenderThread:3239282 [sender.py:send():185] send: files
+2021-10-08 10:33:23,613 INFO    SenderThread:3239282 [sender.py:_save_file():879] saving file wandb-metadata.json with policy now
+2021-10-08 10:33:23,618 DEBUG   HandlerThread:3239282 [handler.py:handle_request():126] handle_request: stop_status
+2021-10-08 10:33:23,618 DEBUG   SenderThread:3239282 [sender.py:send_request():199] send_request: stop_status
+2021-10-08 10:33:23,672 DEBUG   SenderThread:3239282 [sender.py:send():185] send: config
+2021-10-08 10:33:23,672 DEBUG   SenderThread:3239282 [sender.py:send():185] send: config
+2021-10-08 10:33:23,905 INFO    Thread-11 :3239282 [upload_job.py:push():137] Uploaded file /tmp/tmpdowu2341wandb/mth2wgcm-wandb-metadata.json
+2021-10-08 10:33:23,955 INFO    Thread-8  :3239282 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/wandb-summary.json
+2021-10-08 10:33:23,955 INFO    Thread-8  :3239282 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/requirements.txt
+2021-10-08 10:33:23,956 INFO    Thread-8  :3239282 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/conda-environment.yaml
+2021-10-08 10:33:23,956 INFO    Thread-8  :3239282 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/wandb-metadata.json
+2021-10-08 10:33:23,956 INFO    Thread-8  :3239282 [dir_watcher.py:_on_file_created():217] file/dir created: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/output.log
+2021-10-08 10:33:25,954 INFO    Thread-8  :3239282 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/output.log
+2021-10-08 10:33:36,657 WARNING MainThread:3239282 [internal.py:wandb_internal():145] Internal process interrupt: 1
+2021-10-08 10:33:37,148 WARNING MainThread:3239282 [internal.py:wandb_internal():145] Internal process interrupt: 2
+2021-10-08 10:33:37,148 ERROR   MainThread:3239282 [internal.py:wandb_internal():148] Internal process interrupted.
+2021-10-08 10:33:37,623 INFO    WriterThread:3239282 [datastore.py:close():281] close: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/run-wnpakz79.wandb
+2021-10-08 10:33:37,675 INFO    SenderThread:3239282 [sender.py:finish():986] shutting down sender
+2021-10-08 10:33:37,675 INFO    SenderThread:3239282 [dir_watcher.py:finish():283] shutting down directory watcher
+2021-10-08 10:33:37,679 INFO    HandlerThread:3239282 [handler.py:finish():683] shutting down handler
+2021-10-08 10:33:37,956 INFO    SenderThread:3239282 [dir_watcher.py:finish():313] scan: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files
+2021-10-08 10:33:37,957 INFO    SenderThread:3239282 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/requirements.txt requirements.txt
+2021-10-08 10:33:37,957 INFO    SenderThread:3239282 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/conda-environment.yaml conda-environment.yaml
+2021-10-08 10:33:37,961 INFO    SenderThread:3239282 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/config.yaml config.yaml
+2021-10-08 10:33:37,966 INFO    SenderThread:3239282 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/wandb-metadata.json wandb-metadata.json
+2021-10-08 10:33:37,966 INFO    SenderThread:3239282 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/wandb-summary.json wandb-summary.json
+2021-10-08 10:33:37,968 INFO    SenderThread:3239282 [dir_watcher.py:finish():327] scan save: /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/output.log output.log
+2021-10-08 10:33:37,971 INFO    SenderThread:3239282 [file_pusher.py:finish():177] shutting down file pusher
+2021-10-08 10:33:37,971 INFO    SenderThread:3239282 [file_pusher.py:join():182] waiting for file pusher
+2021-10-08 10:33:38,239 INFO    Thread-15 :3239282 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/wandb-summary.json
+2021-10-08 10:33:38,239 INFO    Thread-13 :3239282 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/conda-environment.yaml
+2021-10-08 10:33:38,249 INFO    Thread-12 :3239282 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/requirements.txt
+2021-10-08 10:33:38,253 INFO    Thread-16 :3239282 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/output.log
+2021-10-08 10:33:38,288 INFO    Thread-14 :3239282 [upload_job.py:push():137] Uploaded file /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_103322-wnpakz79/files/config.yaml
+2021-10-08 10:33:39,024 INFO    MainThread:3239282 [internal.py:handle_exit():76] Internal process exited

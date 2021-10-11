@@ -1,0 +1,32 @@
+2021-10-08 10:20:32,476 - objects.TA2_logic.TA2 - INFO - Training Start
+2021-10-08 10:20:32,476 - objects.TA2_logic.TA2 - DEBUG - Starting Training Round: #0
+2021-10-08 10:20:32,488 - objects.TA2_logic.TA2 - INFO - Training Episode Start: #0
+2021-10-08 10:20:32,773 - objects.TA2_logic.TA2 - DEBUG - Resetting State
+2021-10-08 10:21:09,266 - objects.TA2_logic.TA2 - INFO - Training Episode End: performance=0.0
+2021-10-08 10:21:09,266 - objects.TA2_logic.TA2 - INFO - Training Episode End: reward=-5 steps=2000
+2021-10-08 10:21:09,270 - objects.TA2_logic.TA2 - DEBUG - {"obj_type": "training_episode_novelty_ack"}
+2021-10-08 10:21:09,283 - objects.TA2_logic.TA2 - INFO - Training Episode Start: #1
+2021-10-08 10:21:09,564 - objects.TA2_logic.TA2 - DEBUG - Resetting State
+2021-10-08 10:21:17,749 - objects.TA2_logic.TA2 - INFO - Training Episode End: performance=0.0
+2021-10-08 10:21:17,750 - objects.TA2_logic.TA2 - INFO - Training Episode End: reward=-4 steps=399
+2021-10-08 10:21:17,753 - objects.TA2_logic.TA2 - DEBUG - {"obj_type": "training_episode_novelty_ack"}
+2021-10-08 10:21:17,764 - objects.TA2_logic.TA2 - INFO - Training Episode Start: #2
+2021-10-08 10:21:18,043 - objects.TA2_logic.TA2 - DEBUG - Resetting State
+2021-10-08 10:21:28,559 - objects.TA2_logic.TA2 - DEBUG - Starting Training Round: #1
+2021-10-08 10:21:28,559 - objects.TA2_logic.TA2 - DEBUG - Resetting State
+2021-10-08 10:21:33,750 - objects.TA2_logic.TA2 - INFO - Training Episode End: performance=0.0
+2021-10-08 10:21:33,750 - objects.TA2_logic.TA2 - INFO - Training Episode End: reward=-5 steps=285
+2021-10-08 10:21:33,754 - objects.TA2_logic.TA2 - DEBUG - {"obj_type": "training_episode_novelty_ack"}
+2021-10-08 10:21:33,767 - objects.TA2_logic.TA2 - INFO - Training Episode Start: #3
+2021-10-08 10:21:34,049 - objects.TA2_logic.TA2 - DEBUG - Resetting State
+2021-10-08 10:22:12,408 - objects.TA2_logic.TA2 - INFO - Training Episode End: performance=0.0
+2021-10-08 10:22:12,408 - objects.TA2_logic.TA2 - INFO - Training Episode End: reward=-4 steps=2000
+2021-10-08 10:22:12,412 - objects.TA2_logic.TA2 - DEBUG - {"obj_type": "training_episode_novelty_ack"}
+2021-10-08 10:22:12,424 - objects.TA2_logic.TA2 - INFO - Training Episode Start: #4
+2021-10-08 10:22:12,705 - objects.TA2_logic.TA2 - DEBUG - Resetting State
+2021-10-08 10:22:25,586 - objects.TA2_logic.TA2 - DEBUG - Starting Training Round: #2
+2021-10-08 10:22:25,586 - objects.TA2_logic.TA2 - DEBUG - Resetting State
+2021-10-08 10:22:48,343 - objects.TA2_logic.TA2 - INFO - Training Episode End: performance=0.0
+2021-10-08 10:22:48,343 - objects.TA2_logic.TA2 - INFO - Training Episode End: reward=-5 steps=1285
+2021-10-08 10:22:48,347 - objects.TA2_logic.TA2 - DEBUG - {"obj_type": "training_episode_novelty_ack"}
+2021-10-08 10:22:48,359 - objects.TA2_logic.TA2 - INFO - Training Episode Start: #5

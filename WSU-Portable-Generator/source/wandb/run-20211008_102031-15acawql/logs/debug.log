@@ -1,0 +1,29 @@
+2021-10-08 10:20:31,318 INFO    MainThread:3236866 [wandb_setup.py:_flush():69] setting env: {}
+2021-10-08 10:20:31,318 INFO    MainThread:3236866 [wandb_setup.py:_flush():69] setting login settings: {}
+2021-10-08 10:20:31,318 INFO    MainThread:3236866 [wandb_setup.py:_flush():69] setting login settings: {}
+2021-10-08 10:20:31,318 INFO    MainThread:3236866 [wandb_init.py:_log_setup():357] Logging user logs to /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_102031-15acawql/logs/debug.log
+2021-10-08 10:20:31,318 INFO    MainThread:3236866 [wandb_init.py:_log_setup():358] Logging internal logs to /home/ei-lab/code/sailon/WSU-SAILON-NG/WSU-Portable-Generator/source/wandb/run-20211008_102031-15acawql/logs/debug-internal.log
+2021-10-08 10:20:31,318 INFO    MainThread:3236866 [wandb_init.py:init():390] calling init triggers
+2021-10-08 10:20:31,318 INFO    MainThread:3236866 [wandb_init.py:init():397] wandb.init called with sweep_config: {}
+config: {}
+2021-10-08 10:20:31,318 INFO    MainThread:3236866 [wandb_init.py:init():435] starting backend
+2021-10-08 10:20:31,318 INFO    MainThread:3236866 [backend.py:_multiprocessing_setup():72] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2021-10-08 10:20:31,348 INFO    MainThread:3236866 [backend.py:ensure_launched():135] starting backend process...
+2021-10-08 10:20:31,374 INFO    MainThread:3236866 [backend.py:ensure_launched():140] started backend process with pid: 3237003
+2021-10-08 10:20:31,375 INFO    MainThread:3236866 [wandb_init.py:init():440] backend started and connected
+2021-10-08 10:20:31,376 INFO    MainThread:3236866 [wandb_init.py:init():499] updated telemetry
+2021-10-08 10:20:31,377 INFO    MainThread:3236866 [wandb_init.py:init():522] communicating current version
+2021-10-08 10:20:31,762 INFO    MainThread:3236866 [wandb_init.py:init():527] got version response 
+2021-10-08 10:20:31,762 INFO    MainThread:3236866 [wandb_init.py:init():535] communicating run to backend with 30 second timeout
+2021-10-08 10:20:31,846 INFO    MainThread:3236866 [wandb_init.py:init():562] starting run threads in backend
+2021-10-08 10:20:32,467 INFO    MainThread:3236866 [wandb_run.py:_console_start():1651] atexit reg
+2021-10-08 10:20:32,467 INFO    MainThread:3236866 [wandb_run.py:_redirect():1525] redirect: SettingsConsole.REDIRECT
+2021-10-08 10:20:32,467 INFO    MainThread:3236866 [wandb_run.py:_redirect():1530] Redirecting console.
+2021-10-08 10:20:32,468 INFO    MainThread:3236866 [wandb_run.py:_redirect():1586] Redirects installed.
+2021-10-08 10:20:32,468 INFO    MainThread:3236866 [wandb_init.py:init():587] run started, returning control to user process
+2021-10-08 10:20:32,468 INFO    MainThread:3236866 [wandb_config.py:__setitem__():143] config set policy = MlpPolicy - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f5e4c4dcc50>>
+2021-10-08 10:20:32,468 INFO    MainThread:3236866 [wandb_run.py:_config_callback():878] config_cb policy MlpPolicy None
+2021-10-08 10:20:32,468 INFO    MainThread:3236866 [wandb_config.py:__setitem__():143] config set total_timesteps = 1500 - <bound method Run._config_callback of <wandb.sdk.wandb_run.Run object at 0x7f5e4c4dcc50>>
+2021-10-08 10:20:32,468 INFO    MainThread:3236866 [wandb_run.py:_config_callback():878] config_cb total_timesteps 1500 None
+2021-10-08 10:22:55,378 INFO    MainThread:3236866 [wandb_run.py:_atexit_cleanup():1621] got exitcode: 0
+2021-10-08 10:22:55,378 INFO    MainThread:3236866 [wandb_run.py:_restore():1593] restore
