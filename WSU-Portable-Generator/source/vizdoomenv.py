@@ -46,8 +46,25 @@ class VizDoomEnv(gym.Env):
         # grabs terminal flag and performance from TA2
         done = self.terminal_queue.get()
         performance = self.performance_queue.get()
-        reward = (5 if performance else -5) if done else (len(
-            self.last_state_dict['enemies']) - len(next_state_dict['enemies']))
+
+        def compute_reward(state, action, next_state):
+            player = state['player']
+            if len(state['enemies']) > len(next_state['enemies']):
+                return len(state['enemies']) - len(next_state['enemies'])
+            elif action == 5:
+                for i in range(len(state['enemies'])):
+                    enemy = state['enemies'][i]
+                    enemy_prime = next_state['enemies'][i]
+                    dy = enemy['y_position'] - player['y_position']
+                    dx = enemy['x_position'] - player['x_position']
+                    angle = math.atan2(dy, dx) * 180 / math.pi
+                    angle += 360 if angle < 0 else 0
+                    if abs(angle - player['angle']) <= 5 and enemy_prime['health'] < enemy['health']:
+                        return 0.5
+            return 0
+
+        reward = (5 if performance else -5) if done \
+            else compute_reward(self.last_state_dict, action, next_state_dict)
         # increment logging variables
         self.step_count += 1
         self.total_reward += reward

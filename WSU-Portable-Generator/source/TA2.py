@@ -29,6 +29,7 @@ import time
 import random
 import wandb
 from stable_baselines3.a2c import A2C
+from stable_baselines3.ppo import PPO
 
 from objects.TA2_logic import TA2Logic
 from vizdoomenv import VizDoomEnv
@@ -83,7 +84,8 @@ class TA2Agent(TA2Logic):
         self.performance_queue = queue.Queue()
         self.env = VizDoomEnv(self.state_queue, self.action_queue,
                               self.terminal_queue, self.performance_queue, self.log)
-        self.model = A2C('MlpPolicy', self.env, n_steps=2000)
+        self.total_timesteps = 2000
+        self.model = A2C('MlpPolicy', self.env, n_steps=self.total_timesteps)
 
     def experiment_start(self):
         """This function is called when this TA2 has connected to a TA1 and is ready to begin
@@ -92,6 +94,10 @@ class TA2Agent(TA2Logic):
         self.log.info('Experiment Start')
         wandb.login()
         wandb.init(project='vizdoom')
+        config = wandb.config
+        config.model = 'A2C'
+        config.reward_function = 'shooting at enemy'
+        config.total_timesteps = self.total_timesteps
         return
 
     def training_start(self):
@@ -106,7 +112,7 @@ class TA2Agent(TA2Logic):
                 round = 0
                 while True:
                     self.log.debug(f'Starting Training Round: #{round}')
-                    self.model.learn(2000)
+                    self.model.learn(self.total_timesteps)
                     round += 1
             except RuntimeError:
                 self.log.info('Training Completed')
