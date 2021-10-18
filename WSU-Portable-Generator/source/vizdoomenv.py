@@ -47,6 +47,15 @@ class VizDoomEnv(gym.Env):
         done = self.terminal_queue.get()
         performance = self.performance_queue.get()
 
+        def compute_reward(state, next_state):
+            if len(state['enemies']) > len(next_state['enemies']):
+                return len(state['enemies']) - len(next_state['enemies'])
+            health = sum(map(lambda x: x['health'], state['enemies']))
+            next_health = sum(map(lambda x: x['health'], next_state['enemies']))
+            if health > next_health:
+                return 0.1
+            return 0
+
         # def compute_reward(state, action, next_state):
         #     player = state['player']
         #     if len(state['enemies']) > len(next_state['enemies']):
@@ -66,7 +75,8 @@ class VizDoomEnv(gym.Env):
         # reward = (5 if performance else -5) if done \
         #     else compute_reward(self.last_state_dict, action, next_state_dict)
 
-        reward = 1 if action == 5 else 0
+        reward = (5 if performance else -5) if done \
+            else compute_reward(self.last_state_dict, next_state_dict)
 
         # increment logging variables
         self.step_count += 1

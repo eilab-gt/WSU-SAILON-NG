@@ -84,7 +84,7 @@ class TA2Agent(TA2Logic):
         self.performance_queue = queue.Queue()
         self.env = VizDoomEnv(self.state_queue, self.action_queue,
                               self.terminal_queue, self.performance_queue, self.log)
-        self.total_timesteps = 2000
+        self.total_timesteps = 500
         self.model = A2C('MlpPolicy', self.env, n_steps=self.total_timesteps)
 
     def experiment_start(self):
@@ -95,7 +95,7 @@ class TA2Agent(TA2Logic):
         wandb.login()
         wandb.init(project='vizdoom')
         config = wandb.config
-        config.comment = "reward=shoot"
+        config.reward = "enemy-health-decrease"
         config.total_timesteps = self.total_timesteps
         return
 
