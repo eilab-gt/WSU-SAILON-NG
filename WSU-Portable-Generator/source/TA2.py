@@ -95,8 +95,7 @@ class TA2Agent(TA2Logic):
         wandb.login()
         wandb.init(project='vizdoom')
         config = wandb.config
-        config.model = 'A2C'
-        config.reward_function = 'shooting at enemy'
+        config.comment = "reward=shoot"
         config.total_timesteps = self.total_timesteps
         return
 
