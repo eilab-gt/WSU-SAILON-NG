@@ -84,7 +84,7 @@ class TA2Agent(TA2Logic):
         self.performance_queue = queue.Queue()
         self.env = VizDoomEnv(self.state_queue, self.action_queue,
                               self.terminal_queue, self.performance_queue, self.log)
-        self.total_timesteps = 500
+        self.total_timesteps = 2000
         self.model = A2C('MlpPolicy', self.env, n_steps=self.total_timesteps)
 
     def experiment_start(self):
