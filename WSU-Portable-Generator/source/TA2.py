@@ -29,6 +29,8 @@ import time
 import random
 import wandb
 from stable_baselines3.a2c import A2C
+from stable_baselines3.common.monitor import Monitor
+from wandb.integration.sb3 import WandbCallback
 from stable_baselines3.ppo import PPO
 
 from objects.TA2_logic import TA2Logic
@@ -92,10 +94,9 @@ class TA2Agent(TA2Logic):
         the experiment.
         """
         self.log.info('Experiment Start')
-        wandb.login()
         wandb.init(project='vizdoom')
         config = wandb.config
-        config.reward = "enemy-health-decrease"
+        config.comment = "reward=shoot"
         config.total_timesteps = self.total_timesteps
         return
 
@@ -111,8 +112,8 @@ class TA2Agent(TA2Logic):
                 round = 0
                 while True:
                     self.log.debug(f'Starting Training Round: #{round}')
-                    self.model.learn(self.total_timesteps)
-                    round += 1
+                    self.model.learn(self.total_timesteps, callback=WandbCallback())
+                    round += 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
             except RuntimeError:
                 self.log.info('Training Completed')
 
@@ -217,7 +218,7 @@ class TA2Agent(TA2Logic):
         # passing empty dictionary to the env to signal that training is over
         # env responds by throwing a RuntimeError
         self.state_queue.put({})
-        wandb.finish()
+        self.run.finish()
         return
 
     def train_model(self):
