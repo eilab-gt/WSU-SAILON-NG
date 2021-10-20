@@ -23,9 +23,11 @@ class VizDoomEnv(gym.Env):
             'backward', 'shoot', 'turn_left', 'turn_right']
         self.action_freq = {i: 0 for i in range(8)}
 
+
     def reset(self):
         self.step_count = 0
         self.total_reward = 0
+        self.action_freq = {i: 0 for i in range(8)}
         # if in the middle of timesteps use last state o/w grab state from TA2
         self.last_state_dict = self.last_state_dict or self.state_queue.get()
         # checks whether training has ended
@@ -64,7 +66,7 @@ class VizDoomEnv(gym.Env):
                 return -0.001 * (100 - player_next_health)
             return 0
 
-        reward = (5 if performance else -5) if done \
+        reward = (5 if performance else 0) if done \
             else compute_reward(self.last_state_dict, next_state_dict)
 
         # increment logging variables
@@ -76,10 +78,10 @@ class VizDoomEnv(gym.Env):
         if done:
             # log total reward accumulated during episode
             self.log.info(f'Training Episode End: reward={self.total_reward} steps={self.step_count}')
-            wandb.log({'reward': self.total_reward})
-            wandb.log({'length': self.step_count})
+            log_dict = {'reward': self.total_reward, 'length': self.step_count}
             for i in range(8):
-                wandb.log({self.actions[i]: self.action_freq[i]})
+                log_dict[self.actions[i]] = self.action_freq[i] / self.step_count
+            wandb.log(log_dict)
         return next_state, reward, done, {}
 
     def render(self):
