@@ -32,7 +32,7 @@ from stable_baselines3.a2c import A2C
 from stable_baselines3.ppo import PPO
 
 from objects.TA2_logic import TA2Logic
-from vizdoomenv import VizDoomEnv
+from agent import Agent
 
 
 class ThreadedProcessingExample(threading.Thread):
@@ -68,8 +68,7 @@ class TA2Agent(TA2Logic):
     def __init__(self):
         super().__init__()
 
-        self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'}, {'action': 'forward'}, {
-            'action': 'backward'}, {'action': 'shoot'}, {'action': 'turn_left'}, {'action': 'turn_right'}]
+        self.possible_answers = []
         # This variable can be set to true and the system will attempt to end training at the
         # completion of the current episode, or sooner if possible.
         self.end_training_early = False
@@ -78,24 +77,14 @@ class TA2Agent(TA2Logic):
         # or sooner if possible.
         self.end_experiment_early = False
         # queues used to transmit information from TA2 to env and back
-        self.state_queue = queue.Queue()
-        self.action_queue = queue.Queue()
-        self.terminal_queue = queue.Queue()
-        self.performance_queue = queue.Queue()
-        self.env = VizDoomEnv(self.state_queue, self.action_queue,
-                              self.terminal_queue, self.performance_queue, self.log)
-        self.total_timesteps = 100
-        self.model = A2C('MlpPolicy', self.env, n_steps=self.total_timesteps)
+        self.agent = Agent(log=self.log)
 
     def experiment_start(self):
         """This function is called when this TA2 has connected to a TA1 and is ready to begin
         the experiment.
         """
         self.log.info('Experiment Start')
-        wandb.login()
-        wandb.init(project='vizdoom')
-        config = wandb.config
-        config.total_timesteps = self.total_timesteps
+        self.agent.experiment_start()
         return
 
     def training_start(self):
@@ -103,21 +92,7 @@ class TA2Agent(TA2Logic):
         your chosen domain.
         """
         self.log.info('Training Start')
-        # task that runs during the background of training and completes
-        # when training ends by throwing a RuntimeError
-        def learn():
-            try:
-                training_round = 0
-                while True:
-                    self.log.debug(f'Starting Training Round: #{training_round}')
-                    self.model.learn(self.total_timesteps)
-                    training_round += 1
-            except RuntimeError:
-                self.log.info('Training Completed')
-
-        thread = threading.Thread(target=learn)
-        thread.start()
-        return
+        self.agent.training_start()
 
     def training_episode_start(self, episode_number: int):
         """This function is called at the start of each training episode, with the current episode
@@ -128,7 +103,7 @@ class TA2Agent(TA2Logic):
             This identifies the 0-based episode number you are about to begin training on.
         """
         self.log.info('Training Episode Start: #{}'.format(episode_number))
-
+        self.agent.training_episode_start(episode_number)
         return
 
     def training_instance(self, feature_vector: dict, feature_label: dict) -> dict:
@@ -149,12 +124,7 @@ class TA2Agent(TA2Logic):
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
-        # pass feature_vector to state queue so env can return it on reset()/step()
-        self.state_queue.put(feature_vector)
-        # retrieve agent's action from env.step() call
-        action = self.action_queue.get()
-        label_prediction = self.possible_answers[action]
-        return label_prediction
+        return self.agent.training_instance(feature_vector, feature_label)
 
     def training_performance(self, performance: float, feedback: dict = None):
         """Provides the current performance on training after each instance.
@@ -167,14 +137,10 @@ class TA2Agent(TA2Logic):
             budget set in the TA1. If there is no feedback, the object will be None.
         """
         # self.log.debug('Training Performance: {}'.format(performance))
-        # pass terminal flag and step performance to env
-        # env returns terminal flag in step function and utilizes performance to compute final reward
-        self.terminal_queue.put(False)
-        self.performance_queue.put(performance)
+        self.agent.training_performance(performance, feedback)
         return
 
-    def training_episode_end(self, performance: float, feedback: dict = None) -> \
-            (float, float, int, dict):
+    def training_episode_end(self, performance: float, feedback: dict = None):
         """Provides the final performance on the training episode and indicates that the training
         episode has ended.
         Parameters
@@ -196,11 +162,7 @@ class TA2Agent(TA2Logic):
         self.log.info(
             'Training Episode End: performance={}'.format(performance))
 
-        # pass next state, terminal flag, and episodic performance to env
-        # None state signals that the next state is just the previous state
-        self.state_queue.put(None)
-        self.terminal_queue.put(True)
-        self.performance_queue.put(performance)
+        self.agent.training_episode_end(performance, feedback)
 
         novelty_probability = random.random()
         novelty_threshold = 0.8
@@ -213,10 +175,7 @@ class TA2Agent(TA2Logic):
         """This function is called when we have completed the training episodes.
         """
         self.log.info('Training End')
-        # passing empty dictionary to the env to signal that training is over
-        # env responds by throwing a RuntimeError
-        self.state_queue.put({})
-        wandb.finish()
+        self.agent.training_end()
         return
 
     def train_model(self):
