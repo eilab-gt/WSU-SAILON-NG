@@ -1,5 +1,0 @@
-2021-10-08 10:33:23,619 - objects.TA2_logic.TA2 - DEBUG - _run_sail_on_testing()
-2021-10-08 10:33:23,626 - objects.TA2_logic.TA2 - INFO - {"obj_type": "trial_start", "trial_number": 0, "total_trials": 0, "message": "Please RESET TA2 model to SAVED state.", "novelty_description": {}}
-2021-10-08 10:33:23,626 - objects.TA2_logic.TA2 - INFO - Trial Start: #0  novelty_desc: {}
-2021-10-08 10:33:23,626 - objects.TA2_logic.TA2 - INFO - Load model from disk.
-2021-10-08 10:33:23,629 - objects.TA2_logic.TA2 - INFO - Testing Start
