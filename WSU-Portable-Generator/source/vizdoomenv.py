@@ -3,6 +3,7 @@ from gym import spaces
 from util import vectorize_state
 from objects import objects
 import wandb
+import math
 
 
 class VizDoomEnv(gym.Env):
@@ -21,6 +22,7 @@ class VizDoomEnv(gym.Env):
         self.observation_space = spaces.Box(-512, 512, shape=(90,))
         self.enemy_initial_health = None
         self.player_initial_health = None
+        self.player_initial_ammo = None
         self.actions = ['nothing', 'left', 'right', 'forward', 
             'backward', 'shoot', 'turn_left', 'turn_right']
         self.action_freq = {i: 0 for i in range(8)}
@@ -36,12 +38,32 @@ class VizDoomEnv(gym.Env):
             self.enemy_initial_health = sum(map(lambda x: x['health'], 
                 self.last_state_dict['enemies']))
             self.player_initial_health = self.last_state_dict['player']['health']
+            self.player_initial_ammo = self.last_state_dict['player']['ammo']
         # checks whether training has ended
         if self.last_state_dict == {}:
             raise RuntimeError()
         state = vectorize_state(self.last_state_dict)
         self.log.debug('Resetting State')
         return state
+
+    def compute_reward(self, state, next_state):
+        enemy_kill = len(state['enemies']) - len(next_state['enemies'])
+        enemy_damage = 0.001 * (sum(map(lambda x: x['health'], state['enemies'])) 
+            - sum(map(lambda x: x['health'], next_state['enemies']))) / self.enemy_initial_health
+        player_damage = -0.001 * (state['player']['health'] - next_state['player']['health']) / self.player_initial_health
+        player_ammo = -0.0001 * (state['player']['ammo'] - next_state['player']['ammo']) / self.player_initial_ammo
+        player_behavior  = 0
+        player_coordinate = next_state['player']['x_position'], next_state['player']['y_position']
+        for enemy in next_state['enemies']:
+            enemy_coordinate = enemy['x_position'], enemy['y_position']
+            z = math.atan2(enemy_coordinate[1] - player_coordinate[1], 
+                enemy_coordinate[0] - player_coordinate[0]) * 180 / math.pi
+            if z < 0:
+                z += 360
+            if z - 5 <= next_state['player']['z_position'] <= z + 5:
+                player_behavior = 0.001
+                break
+        return enemy_kill + enemy_damage + player_damage + player_ammo + player_behavior
 
     def step(self, action):
         # passes action to TA2
@@ -59,15 +81,8 @@ class VizDoomEnv(gym.Env):
         done = self.terminal_queue.get()
         performance = self.performance_queue.get()
 
-        def compute_reward(state, next_state):
-            enemy_kill = len(state['enemies']) - len(next_state['enemies'])
-            enemy_damage = 0.001 * (sum(map(lambda x: x['health'], state['enemies'])) 
-                - sum(map(lambda x: x['health'], next_state['enemies']))) / self.enemy_initial_health
-            player_damage = -0.001 * (state['player']['health'] - next_state['player']['health']) / self.player_initial_health
-            return enemy_kill + enemy_damage + player_damage
-
         reward = (5 if performance else 0) if done \
-            else compute_reward(self.last_state_dict, next_state_dict)
+            else self.compute_reward(self.last_state_dict, next_state_dict)
 
         # increment logging variables
         self.step_count += 1

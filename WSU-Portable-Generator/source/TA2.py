@@ -78,7 +78,6 @@ class TA2Agent(TA2Logic):
         # or sooner if possible.
         self.end_experiment_early = False
         # queues used to transmit information from TA2 to env and back
-        self.eval = False
         self.state_queue = queue.Queue()
         self.action_queue = queue.Queue()
         self.terminal_queue = queue.Queue()
@@ -96,7 +95,6 @@ class TA2Agent(TA2Logic):
         wandb.login()
         wandb.init(project='vizdoom')
         config = wandb.config
-        config.reward = "enemy health decrease, health penalty"
         config.total_timesteps = self.total_timesteps
         return
 
@@ -109,12 +107,8 @@ class TA2Agent(TA2Logic):
         # when training ends by throwing a RuntimeError
         def learn():
             try:
-                eval_round = 0
                 training_round = 0
                 while True:
-                    if training_round % 10 == 0:
-                        self.log.debug(f'Starting Eval Round: #{eval_round}')
-                        eval_round += 1
                     self.log.debug(f'Starting Training Round: #{training_round}')
                     self.model.learn(self.total_timesteps)
                     training_round += 1
