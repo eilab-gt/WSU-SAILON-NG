@@ -19,6 +19,8 @@ class VizDoomEnv(gym.Env):
         self.log = log
         self.action_space = spaces.Discrete(8)
         self.observation_space = spaces.Box(-512, 512, shape=(90,))
+        self.enemy_initial_health = None
+        self.player_initial_health = None
         self.actions = ['nothing', 'left', 'right', 'forward', 
             'backward', 'shoot', 'turn_left', 'turn_right']
         self.action_freq = {i: 0 for i in range(8)}
@@ -29,7 +31,11 @@ class VizDoomEnv(gym.Env):
         self.total_reward = 0
         self.action_freq = {i: 0 for i in range(8)}
         # if in the middle of timesteps use last state o/w grab state from TA2
-        self.last_state_dict = self.last_state_dict or self.state_queue.get()
+        if not self.last_state_dict:
+            self.last_state_dict = self.state_queue.get()
+            self.enemy_initial_health = sum(map(lambda x: x['health'], 
+                self.last_state_dict['enemies']))
+            self.player_initial_health = self.last_state_dict['player']['health']
         # checks whether training has ended
         if self.last_state_dict == {}:
             raise RuntimeError()
@@ -54,17 +60,11 @@ class VizDoomEnv(gym.Env):
         performance = self.performance_queue.get()
 
         def compute_reward(state, next_state):
-            if len(state['enemies']) > len(next_state['enemies']):
-                return len(state['enemies']) - len(next_state['enemies'])
-            player_health = state['player']['health']
-            player_next_health = next_state['player']['health']
-            enemy_health = sum(map(lambda x: x['health'], state['enemies']))
-            enemy_next_health = sum(map(lambda x: x['health'], next_state['enemies']))
-            if enemy_health > enemy_next_health:
-                return 0.1
-            if player_health > player_next_health:
-                return -0.001 * (100 - player_next_health)
-            return 0
+            enemy_kill = len(state['enemies']) - len(next_state['enemies'])
+            enemy_damage = 0.001 * (sum(map(lambda x: x['health'], state['enemies'])) 
+                - sum(map(lambda x: x['health'], next_state['enemies']))) / self.enemy_initial_health
+            player_damage = -0.001 * (state['player']['health'] - next_state['player']['health']) / self.player_initial_health
+            return enemy_kill + enemy_damage + player_damage
 
         reward = (5 if performance else 0) if done \
             else compute_reward(self.last_state_dict, next_state_dict)
