@@ -307,7 +307,6 @@ class TA2Agent(TA2Logic):
             feature_vector, novelty_indicator))
 
         label_prediction = self.possible_answers[self.model.predict(self._vectorize_state(feature_vector))[0]]
-        print(label_prediction)
 
         return label_prediction
 
