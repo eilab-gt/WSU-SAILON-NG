@@ -26,6 +26,9 @@ import queue
 import random
 import threading
 import time
+from stable_baselines3 import A2C
+import numpy as np
+import math
 
 from objects.TA2_logic import TA2Logic
 
@@ -66,12 +69,41 @@ class TA2Agent(TA2Logic):
         self.possible_answers = list()
         # This variable can be set to true and the system will attempt to end training at the
         # completion of the current episode, or sooner if possible.
-        self.end_training_early = False
+        self.end_training_early = True
         # This variable is checked only during the evaluation phase.  If set to True the system
         # will attempt to cleanly end the experiment at the conclusion of the current episode,
         # or sooner if possible.
         self.end_experiment_early = False
         return
+    @staticmethod
+    def _vectorize_state(state):
+
+        def _vectorize_object(obj):
+            vector = []
+            for key in obj:
+                if key == 'id' or type(obj[key]) is str:
+                    continue
+                vector.append(obj[key])
+            return np.array(vector)
+
+        def _vectorize_list(lst):
+            vector = []
+            for obj in lst:
+                vector.append(_vectorize_object(obj))
+            return np.array(vector).reshape(-1)
+
+        vector = np.zeros(90)
+        vector[0:len(state['enemies']) * 5] = _vectorize_list(state['enemies'])
+        vector[20:20 + len(state['items']['health']) *
+               4] = _vectorize_list(state['items']['health'])
+        vector[36:36 + len(state['items']['ammo']) *
+               4] = _vectorize_list(state['items']['ammo'])
+        vector[52:52 + len(state['items']['trap']) *
+               4] = _vectorize_list(state['items']['trap'])
+        vector[68:68 + len(state['items']['obstacle']) *
+               4] = _vectorize_list(state['items']['obstacle'])
+        vector[84:] = _vectorize_object(state['player'])
+        return vector
 
     def experiment_start(self):
         """This function is called when this TA2 has connected to a TA1 and is ready to begin
@@ -234,6 +266,7 @@ class TA2Agent(TA2Logic):
         episodes.
         """
         self.log.info('Testing Start')
+        self.model = A2C.load('submission.zip')
         return
 
     def testing_episode_start(self, episode_number: int):
@@ -306,7 +339,7 @@ class TA2Agent(TA2Logic):
             feature_vector, novelty_indicator))
 
         # Return dummy random choices, but should be determined by trained model
-        label_prediction = random.choice(self.possible_answers)
+        label_prediction = self.model.predict(self._vectorize_state(feature_vector))
 
         return label_prediction
 
