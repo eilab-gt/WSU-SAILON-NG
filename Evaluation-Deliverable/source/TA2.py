@@ -65,15 +65,18 @@ class ThreadedProcessingExample(threading.Thread):
 class TA2Agent(TA2Logic):
     def __init__(self):
         super().__init__()
+       
 
         self.possible_answers = list()
         # This variable can be set to true and the system will attempt to end training at the
         # completion of the current episode, or sooner if possible.
-        self.end_training_early = True
+        self.end_training_early = False
         # This variable is checked only during the evaluation phase.  If set to True the system
         # will attempt to cleanly end the experiment at the conclusion of the current episode,
         # or sooner if possible.
         self.end_experiment_early = False
+        self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'}, {'action': 'forward'}, {
+            'action': 'backward'}, {'action': 'shoot'}, {'action': 'turn_left'}, {'action': 'turn_right'}]
         return
     @staticmethod
     def _vectorize_state(state):
@@ -257,8 +260,6 @@ class TA2Agent(TA2Logic):
         """
         self.log.info('Trial Start: #{}  novelty_desc: {}'.format(trial_number,
                                                                   str(novelty_description)))
-        if len(self.possible_answers) == 0:
-            self.possible_answers.append(dict({'action': 'left'}))
         return
 
     def testing_start(self):
@@ -279,39 +280,6 @@ class TA2Agent(TA2Logic):
             This is the 0-based episode number in the current trial.
         """
         self.log.info('Testing Episode Start: #{}'.format(episode_number))
-
-        # Throw something together to create work.
-        # work_list = list([5000])
-        # for i in range(3 + episode_number):
-        #     work_list.append(50000)
-        # response_queue = queue.Queue()
-        # response = None
-        # # Initialize the example of doing work safely outside the main thread.
-        # # Remember, in Python all objects beyond int, float, bool, and str are passed
-        # # by reference.
-        # threaded_work = ThreadedProcessingExample(processing_object=work_list,
-        #                                           response_queue=response_queue)
-        # # Start the work in a separate thread.
-        # threaded_work.start()
-        #
-        # while response is None:
-        #     try:
-        #         # Try to get the response from the queue for 5 seconds before we let the AMQP
-        #         # network event loop do any required work (such as sending heartbeats) for
-        #         # 0.5 seconds.  By having the get(block=True) we ensure that there is basically
-        #         # no wait for the result once it is put in the queue.
-        #         response = response_queue.get(block=True, timeout=5)
-        #     except queue.Empty:
-        #         # Process any amqp events for 0.5 seconds before we try to get the results again.
-        #         self.process_amqp_events()
-        #
-        # # Safely end and clean up the threaded work object.
-        # threaded_work.stop()
-        # threaded_work.join()
-        #
-        # self.log.info('message from threaded work: {}'.format(response[1]))
-        # self.log.warning('Please remove this sample threaded work object from '
-        #                  'testing_episode_start() before running actual experiments.')
         return
 
     def testing_instance(self, feature_vector: dict, novelty_indicator: bool = None) -> dict:
@@ -338,8 +306,8 @@ class TA2Agent(TA2Logic):
         self.log.debug('Testing Instance: feature_vector={}, novelty_indicator={}'.format(
             feature_vector, novelty_indicator))
 
-        # Return dummy random choices, but should be determined by trained model
-        label_prediction = self.model.predict(self._vectorize_state(feature_vector))
+        label_prediction = self.possible_answers[self.model.predict(self._vectorize_state(feature_vector))[0]]
+        print(label_prediction)
 
         return label_prediction
 
