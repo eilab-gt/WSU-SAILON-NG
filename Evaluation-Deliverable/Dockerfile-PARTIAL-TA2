@@ -10,5 +10,8 @@ ADD source/objects /aiq-sail-on/objects/
 # Load TA2.py
 ADD source/TA2.py /aiq-sail-on/
 
+# Add pre trained model
+ADD source/submission.zip /aiq-sail-on/
+
 # Change local dir
 WORKDIR /aiq-sail-on/
