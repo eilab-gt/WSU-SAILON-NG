@@ -14,8 +14,8 @@ docker-compose to run several copies of your agent on the same machine in parall
 through the evaluation trials.
 Using the example here, that would look like this.
 ```
-docker-compose -f groupname-ta2.yml build
-docker-compose -f groupname-ta2.yml up -d --scale groupname-ta2=10
+docker-compose -f GATech-ta2.yml build
+docker-compose -f GATech-ta2.yml up -d --scale GATech-ta2=10
 ```
 
 ## A More Detailed View
@@ -26,17 +26,17 @@ MockN (mock novelty) API.  Requests for MockN credentials can be sent to Brian T
 
 1) Build the TA2 agent.
 ```
-docker-compose -f groupname-ta2.yml build
+docker-compose -f GATech-ta2.yml build
 ```
 2) Start 1 instance of TA2 to initiate the experiment and populate the `evaluation.config` file
 with the experiment identifier.
 ```
-docker-compose -f groupname-ta2.yml up -d --scale groupname-ta2=1
+docker-compose -f GATech-ta2.yml up -d --scale GATech-ta2=1
 ```
 3) Now that the file `evaluation.config` has been updated outside the docker container, we can
 scale up additional instances of your agent.
 ```
-docker-compose -f groupname-ta2.yml up -d --scale groupname-ta2=2
+docker-compose -f GATech-ta2.yml up -d --scale GATech-ta2=2
 ```
 
 If you are not providing a pre-trained model and will be training on the provided training
