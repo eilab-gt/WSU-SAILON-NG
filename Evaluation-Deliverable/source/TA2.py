@@ -154,8 +154,6 @@ class TA2Agent(TA2Logic):
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
-        self.log.debug('Training Instance: feature_vector={}  feature_label={}'.format(
-            feature_vector, feature_label))
         if feature_label not in self.possible_answers:
             self.possible_answers.append(copy.deepcopy(feature_label))
 
@@ -174,8 +172,7 @@ class TA2Agent(TA2Logic):
             A dictionary that may provide additional feedback on your prediction based on the
             budget set in the TA1. If there is no feedback, the object will be None.
         """
-        self.log.debug('Training Performance: {}'.format(performance))
-        return
+        pass
 
     def training_episode_end(self, performance: float, feedback: dict = None) -> \
             (float, float, int, dict):
@@ -218,13 +215,7 @@ class TA2Agent(TA2Logic):
         empty.  After this completes, the logic calls save_model() and reset_model() as needed
         throughout the rest of the experiment.
         """
-        self.log.info('Train the model here if needed.')
-
-        # Simulate training the model by sleeping.
-        self.log.info('Simulating training with a 5 second sleep.')
-        time.sleep(5)
-
-        return
+        pass
 
     def save_model(self, filename: str):
         """Saves the current model in memory to disk so it may be loaded back to memory again.
@@ -234,8 +225,7 @@ class TA2Agent(TA2Logic):
         filename : str
             The filename to save the model to.
         """
-        self.log.info('Save model to disk.')
-        return
+        pass
 
     def reset_model(self, filename: str):
         """Loads the model from disk to memory.
@@ -246,6 +236,8 @@ class TA2Agent(TA2Logic):
             The filename where the model was stored.
         """
         self.log.info('Load model from disk.')
+        self.model = A2C.load('submission.zip')
+        self.log.info('Model has been loaded')
         return
 
     def trial_start(self, trial_number: int, novelty_description: dict):
@@ -267,7 +259,6 @@ class TA2Agent(TA2Logic):
         episodes.
         """
         self.log.info('Testing Start')
-        self.model = A2C.load('submission.zip')
         return
 
     def testing_episode_start(self, episode_number: int):
@@ -302,12 +293,8 @@ class TA2Agent(TA2Logic):
         dict
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
-        """
-        self.log.debug('Testing Instance: feature_vector={}, novelty_indicator={}'.format(
-            feature_vector, novelty_indicator))
-
+        """  
         label_prediction = self.possible_answers[self.model.predict(self._vectorize_state(feature_vector))[0]]
-
         return label_prediction
 
     def testing_performance(self, performance: float, feedback: dict = None):
