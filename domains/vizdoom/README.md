@@ -289,7 +289,7 @@ Each bullet (player and enemy) does approximately 5 damage, depending on the arm
 
 **7. Does a player have a maximum ammo cap?**
 
-The player has no upper-limit for either health or ammo. The enemy has infinite ammo.
+The player has a maximum cap of 200 for both health and ammo. The enemy has infinite ammo.
 
 **8. How large (x,y) are each of the items and agents?**
 
@@ -303,3 +303,7 @@ ID's are unique per object. So, no two object have the same ID. However, objects
 
 You can do this by modifying or replacing the novelty level WAD file (
 ``WSU-SAILON-NG/WSU-Portable-Generator/source/partial_env_generator/envs/vizdoom/phase_2_reduced.wad``). A more readable version of the WAD file is in the directory ``WSU-SAILON-NG/WSU-Portable-Generator/source/partial_env_generator/envs/vizdoom/wad_reduced``. To get started with editing Doom scenarios, see [Custom Scenarios](http://vizdoom.cs.put.edu.pl/tutorial#scenarios).
+    
+**11. Are obstacles fixed?**
+    
+Obstacles have a large mass but can move a very small amount when moved into or when shot. 

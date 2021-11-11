@@ -1733,6 +1733,9 @@ class TA1:
 
         cache_valid_domains = list(request.domain_dict.keys())
         cache_valid_data_types = None
+        cache_valid_difficulty = list([objects.DIFFICULTY_EASY,
+                                       objects.DIFFICULTY_MEDIUM,
+                                       objects.DIFFICULTY_HARD])
         cache_novelty_types = list([objects.NOVELTY_200] + self._server_novelty)
         cache_trial_novelty = dict({
             train_type: dict({objects.NOVELTY_200: list([objects.NOVELTY_200])}),
@@ -1785,6 +1788,8 @@ class TA1:
             cache_valid_data_types = list()
             cache_trial_novelty = dict()
             for episode in experiment.training.episodes:
+                if episode.difficulty not in cache_valid_difficulty:
+                    cache_valid_difficulty.append(episode.difficulty)
                 if episode.domain not in cache_valid_domains:
                     cache_valid_domains.append(episode.domain)
                 if episode.data_type not in cache_valid_data_types:
@@ -1838,7 +1843,7 @@ class TA1:
                 for novelty in cache_novelty_types:
                     self.log.debug('novelty = {}'.format(novelty))
                     self.dataset_cache[domain_id][data_type][novelty] = dict()
-                    for difficulty in self._server_difficulty:
+                    for difficulty in cache_valid_difficulty:
                         self.log.debug('difficulty = {}'.format(difficulty))
                         self.dataset_cache[domain_id][data_type][novelty][difficulty] = dict()
                         self.log.debug('cache_trial_novelty = {}'.format(str(cache_trial_novelty)))
@@ -4291,8 +4296,12 @@ class TA1:
             # Get the dataset_id so we can add a new episode.
             domain_id = self.domain_ids[episode.domain]
             """
-            self.log.debug('domain_id={} data_type={} novelty={} difficulty={}'.format(
-                domain_id, episode.data_type, episode.novelty, episode.difficulty))
+            self.log.debug('domain_id={} data_type={} novelty={} difficulty={} '
+                           'trial_novelty={}'.format(domain_id,
+                                                     episode.data_type,
+                                                     episode.novelty,
+                                                     episode.difficulty,
+                                                     episode.trial_novelty))
             self.log.debug('{}'.format(self.dataset_cache[domain_id]))
             self.log.debug('{}'.format(self.dataset_cache[domain_id][episode.data_type]))
             self.log.debug('{}'.format(self.dataset_cache[domain_id][episode.data_type]
@@ -4300,7 +4309,11 @@ class TA1:
             self.log.debug('{}'.format(self.dataset_cache[domain_id][episode.data_type]
                                        [episode.novelty][episode.difficulty]))
             self.log.debug('{}'.format(self.dataset_cache[domain_id][episode.data_type]
-                                       [episode.novelty][episode.difficulty]['dataset_id']))
+                                       [episode.novelty][episode.difficulty]
+                                       [episode.trial_novelty]))
+            self.log.debug('{}'.format(self.dataset_cache[domain_id][episode.data_type]
+                                       [episode.novelty][episode.difficulty]
+                                       [episode.trial_novelty]['dataset_id']))
             """
             dataset_id = self.dataset_cache[domain_id][episode.data_type][episode.novelty][
                 episode.difficulty][episode.trial_novelty]['dataset_id']
