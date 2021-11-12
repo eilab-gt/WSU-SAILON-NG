@@ -258,14 +258,14 @@ class TA2Agent(TA2Logic):
         """This function is called when this TA2 has connected to a TA1 and is ready to begin
         the experiment.
         """
-        self.log.info('Experiment Start')
+        # self.log.info('Experiment Start')
         return
 
     def training_start(self):
         """This function is called when we are about to begin training on episodes of data in
         your chosen domain.
         """
-        self.log.info('Training Start')
+        # self.log.info('Training Start')
         return
 
     def training_episode_start(self, episode_number: int):
@@ -277,7 +277,7 @@ class TA2Agent(TA2Logic):
         episode_number : int
             This identifies the 0-based episode number you are about to begin training on.
         """
-        self.log.info('Training Episode Start: #{}'.format(episode_number))
+        # self.log.info('Training Episode Start: #{}'.format(episode_number))
         return
 
     def training_instance(self, feature_vector: dict, feature_label: dict) -> dict:
@@ -458,7 +458,7 @@ class TA2Agent(TA2Logic):
         #         # network event loop do any required work (such as sending heartbeats) for
         #         # 0.5 seconds.  By having the get(block=True) we ensure that there is basically
         #         # no wait for the result once it is put in the queue.
-        #         response = response_queue.get(block=True, timeout=5)
+        #         response = response_queue.get(block=True, )
         #     except queue.Empty:
         #         # Process any amqp events for 0.5 seconds before we try to get the results again.
         #         self.process_amqp_events()
@@ -510,6 +510,7 @@ class TA2Agent(TA2Logic):
             budget set in the TA1. If there is no feedback, the object will be None.
         """
         performance_queue.put(performance)
+        terminal_queue.put(False)
         return
 
     def testing_episode_end(self, performance: float, feedback: dict = None):
@@ -533,8 +534,11 @@ class TA2Agent(TA2Logic):
         """
         self.log.info(
             'Testing Episode End: performance={}'.format(performance))
+
         state_queue.put({})
         performance_queue.put(performance)
+        terminal_queue.put(True)
+
         novelty_probability = random.random()
         novelty_threshold = 0.8
         novelty = random.choice(list(range(4)))
