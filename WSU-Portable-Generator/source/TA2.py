@@ -94,16 +94,19 @@ class VizDoomEnv(Env):
             return np.array(vector).reshape(-1)
 
         vector = np.zeros(90)
-        vector[0:len(state['enemies']) * 5] = _vectorize_list(state['enemies'])
-        vector[20:20 + len(state['items']['health']) *
-               4] = _vectorize_list(state['items']['health'])
-        vector[36:36 + len(state['items']['ammo']) *
-               4] = _vectorize_list(state['items']['ammo'])
-        vector[52:52 + len(state['items']['trap']) *
-               4] = _vectorize_list(state['items']['trap'])
-        vector[68:68 + len(state['items']['obstacle']) *
-               4] = _vectorize_list(state['items']['obstacle'])
+
+        vector[0:min(len(state['enemies']) *
+                     5, 20)] = _vectorize_list(state['enemies'])[:20]
+        vector[20:min(20 + len(state['items']['health']) * 4, 36)
+               ] = _vectorize_list(state['items']['health'])[:16]
+        vector[36:min(36 + len(state['items']['ammo']) *
+                      4, 52)] = _vectorize_list(state['items']['ammo'])[:16]
+        vector[52:min(52 + len(state['items']['trap']) *
+                      4, 68)] = _vectorize_list(state['items']['trap'])[:16]
+        vector[68:min(68 + len(state['items']['obstacle']) *
+                      4, 84)] = _vectorize_list(state['items']['obstacle'])[:16]
         vector[84:] = _vectorize_object(state['player'])
+
         return vector
 
     def _log_backprop_round(self):
@@ -252,6 +255,7 @@ class TA2Agent(TA2Logic):
             'a2c_0.zip', n_steps=self.n_steps, env=self.env, mask=self.mask)
         self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'}, {'action': 'forward'}, {
             'action': 'backward'}, {'action': 'shoot'}, {'action': 'turn_left'}, {'action': 'turn_right'}]
+        self.feature_vector = None
         return
 
     def experiment_start(self):
@@ -493,6 +497,7 @@ class TA2Agent(TA2Logic):
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
+        self.feature_vector = feature_vector
         state_queue.put(feature_vector)
         action = action_queue.get()
         label_prediction = self.possible_answers[action]
@@ -535,7 +540,7 @@ class TA2Agent(TA2Logic):
         self.log.info(
             'Testing Episode End: performance={}'.format(performance))
 
-        state_queue.put({})
+        state_queue.put(self.feature_vector)
         performance_queue.put(performance)
         terminal_queue.put(True)
 
@@ -550,6 +555,7 @@ class TA2Agent(TA2Logic):
         """This is called after the last episode of a trial has completed, before trial_end().
         """
         self.log.info('Testing End')
+        state_queue.put({})
         return
 
     def trial_end(self):
