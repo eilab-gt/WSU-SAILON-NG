@@ -96,15 +96,16 @@ class TA2Agent(TA2Logic):
             return np.array(vector).reshape(-1)
 
         vector = np.zeros(90)
-        vector[0:len(state['enemies']) * 5] = _vectorize_list(state['enemies'])
-        vector[20:20 + len(state['items']['health']) *
-               4] = _vectorize_list(state['items']['health'])
-        vector[36:36 + len(state['items']['ammo']) *
-               4] = _vectorize_list(state['items']['ammo'])
-        vector[52:52 + len(state['items']['trap']) *
-               4] = _vectorize_list(state['items']['trap'])
-        vector[68:68 + len(state['items']['obstacle']) *
-               4] = _vectorize_list(state['items']['obstacle'])
+        vector[0:min(len(state['enemies']) *
+                     5, 20)] = _vectorize_list(state['enemies'])[:20]
+        vector[20:min(20 + len(state['items']['health']) * 4, 36)
+               ] = _vectorize_list(state['items']['health'])[:16]
+        vector[36:min(36 + len(state['items']['ammo']) *
+                      4, 52)] = _vectorize_list(state['items']['ammo'])[:16]
+        vector[52:min(52 + len(state['items']['trap']) *
+                      4, 68)] = _vectorize_list(state['items']['trap'])[:16]
+        vector[68:min(68 + len(state['items']['obstacle']) *
+                      4, 84)] = _vectorize_list(state['items']['obstacle'])[:16]
         vector[84:] = _vectorize_object(state['player'])
         return vector
 
