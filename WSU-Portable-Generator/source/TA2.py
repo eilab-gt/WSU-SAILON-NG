@@ -27,7 +27,6 @@ import random
 import threading
 import time
 import math
-import wandb
 import torch as th
 import numpy as np
 from gym import Env, spaces
@@ -43,166 +42,136 @@ terminal_queue = queue.Queue()
 
 class VizDoomEnv(Env):
 
-    def __init__(self, log, n_steps=100, enemy_coeff=1, player_coeff=1, ammo_coeff=0.1, face_reward=0.001, shoot_reward=0.1):
+    def __init__(self):
         super().__init__()
-        self.step_count = 0
-        self.total_reward = 0
-        self.total_faces = 0
-        self.total_shoots = 0
-        self.episode_length = 0
-        self.backprop_round = 0
-        self.n_steps = n_steps
-        self.enemy_coeff = enemy_coeff
-        self.player_coeff = player_coeff
-        self.ammo_coeff = ammo_coeff
-        self.face_reward = face_reward
-        self.shoot_reward = shoot_reward
-        self.log = log
-        self.face = False
         self.last_state = None
+        self.map_norm = 1000
+        self.health_norm = 100
+        self.rooms = [
+            {'x': (-512, -384), 'y': (-320, 320), 'index': [0, 5]},
+            {'x': (-320, 320), 'y': (-512, -384), 'index': [1, 7]},
+            {'x': (-320, 320), 'y': (384, 512), 'index': [2, 8]},
+            {'x': (384, 512), 'y': (-320, 320), 'index': [3, 6]},
+            {'x': (-320, 320), 'y': (-320, 320), 'index': [4, 5, 6, 7, 8]},
+            {'x': (-384, -320), 'y': (-64, 64), 'index': [5, 0, 4]},
+            {'x': (320, 384), 'y': (-64, 64), 'index': [6, 3, 4]},
+            {'x': (-64, 64), 'y': (-384, -320), 'index': [7, 1, 4]},
+            {'x': (-64, 64), 'y': (320, 384), 'index': [8, 2, 4]}
+        ]
+        self.item_types = {'health': 1, 'ammo': 0.5, 'trap': 0, 'obstacle': -0.5}
         self.action_space = spaces.Discrete(8)
-        self.observation_space = spaces.Box(-512, 512, shape=(90,))
-        self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'}, {'action': 'forward'}, {
-            'action': 'backward'}, {'action': 'shoot'}, {'action': 'turn_left'}, {'action': 'turn_right'}]
-        self.action_names = list(
-            map(lambda x: x['action'], self.possible_answers))
-        self.action_freqs = {i: 0 for i in range(len(self.action_names))}
-        wandb.init(project='vizdoom-test', config={
-            'n_steps': n_steps,
-            'enemy_coeff': enemy_coeff,
-            'player_coeff': player_coeff,
-            'ammo_coeff':  ammo_coeff,
-            'face_reward': face_reward,
-            'shoot_reward': shoot_reward
-        })
+        self.observation_space = spaces.Box(-1, 1, shape=(22,))
 
-    @staticmethod
-    def _vectorize_state(state):
+    def _vectorize_state(self, obs):
 
-        def _vectorize_object(obj):
-            vector = []
-            for key in obj:
-                if key == 'id' or type(obj[key]) is str:
+        def get_room(obj):
+            x, y = obj['x_position'], obj['y_position']
+            for room in self.rooms:
+                if room['x'][0] <= x <= room['x'][1] \
+                        and room['y'][0] <= y <= room['y'][1]:
+                    return room['index']
+
+        def normalize(value, offset, norm):
+            return (value + offset) / (norm or 1)
+
+        def calculate_relative_angle(a, b):
+            if abs(a - b) < abs(a - b - 360):
+                return a - b
+            else:
+                return a - b - 360
+
+        def normalize_angle(angle, norm):
+            if angle > 180:
+                return (360 - angle) / norm
+            elif angle < -180:
+                return (angle + 360) / norm
+            else:
+                return angle / norm
+
+        vector = np.zeros(22) - 1
+        meta_data = dict()
+
+        vector[0] = normalize(obs['player']['x_position'], self.map_norm / 2, self.map_norm)
+        vector[1] = normalize(obs['player']['y_position'], self.map_norm / 2, self.map_norm)
+        vector[2] = normalize(obs['player']['angle'], 0, 360)
+        vector[3] = normalize(obs['player']['health'], 0, self.health_norm)
+        vector[4] = normalize(obs['player']['ammo'], 0, self.health_norm)
+
+        player = obs['player']
+        player_room = get_room(obs['player'])
+        player_coordinate = np.array([player['x_position'], player['y_position']])
+
+        relevant_enemies = []
+        meta_data['enemies_in_room'] = 0
+        for enemy in obs['enemies']:
+            enemy_room = get_room(enemy)
+            if enemy_room[0] in player_room:
+                meta_data['enemies_in_room'] += 1
+            enemy_coordinate = np.array([enemy['x_position'], enemy['y_position']])
+            dist = np.linalg.norm(player_coordinate - enemy_coordinate)
+            enemy['relative_distance'] = dist
+            relevant_enemies.append(enemy)
+        relevant_enemies = sorted(relevant_enemies, key=lambda x: x['relative_distance'])[:2]
+
+        pointer = 5
+        for i in range(len(relevant_enemies)):
+            offset = i * 4
+            enemy = relevant_enemies[i]
+            enemy_coordinate = np.array([enemy['x_position'], enemy['y_position']])
+            angle = math.atan2(enemy_coordinate[1] - player_coordinate[1],
+                               enemy_coordinate[0] - player_coordinate[0]) * 180 / math.pi
+            relative_angle = calculate_relative_angle(player['angle'], angle)
+            relative_aim_angle = calculate_relative_angle(enemy['angle'], angle)
+            vector[pointer + offset] = normalize(enemy['health'], 0, self.health_norm)
+            vector[pointer + offset + 1] = normalize(enemy['relative_distance'], 0, self.map_norm)
+            vector[pointer + offset + 2] = normalize_angle(relative_angle, 180)
+            vector[pointer + offset + 3] = normalize_angle(relative_aim_angle, 180)
+
+        relevant_items = []
+        for item_type in self.item_types:
+            for item in obs['items'][item_type]:
+                item_room = get_room(item)
+                if item_room[0] not in player_room:
                     continue
-                vector.append(obj[key])
-            return np.array(vector)
+                item_coordinate = np.array([item['x_position'], item['y_position']])
+                dist = np.linalg.norm(player_coordinate - item_coordinate)
+                item['type'] = item_type
+                item['relative_distance'] = dist
+                relevant_items.append(item)
+        relevant_items = sorted(relevant_items, key=lambda x: x['relative_distance'])[:3]
 
-        def _vectorize_list(lst):
-            vector = []
-            for obj in lst:
-                vector.append(_vectorize_object(obj))
-            return np.array(vector).reshape(-1)
-
-        vector = np.zeros(90)
-
-        vector[0:min(len(state['enemies']) *
-                     5, 20)] = _vectorize_list(state['enemies'])[:20]
-        vector[20:min(20 + len(state['items']['health']) * 4, 36)
-               ] = _vectorize_list(state['items']['health'])[:16]
-        vector[36:min(36 + len(state['items']['ammo']) *
-                      4, 52)] = _vectorize_list(state['items']['ammo'])[:16]
-        vector[52:min(52 + len(state['items']['trap']) *
-                      4, 68)] = _vectorize_list(state['items']['trap'])[:16]
-        vector[68:min(68 + len(state['items']['obstacle']) *
-                      4, 84)] = _vectorize_list(state['items']['obstacle'])[:16]
-        vector[84:] = _vectorize_object(state['player'])
+        pointer = 13
+        for i in range(len(relevant_items)):
+            offset = i * 3
+            item = relevant_items[i]
+            item_coordinate = np.array([item['x_position'], item['y_position']])
+            angle = math.atan2(item_coordinate[1] - player_coordinate[1],
+                               item_coordinate[0] - player_coordinate[0]) * 180 / math.pi
+            relative_angle = calculate_relative_angle(player['angle'], angle)
+            vector[pointer + offset] = self.item_types[item['type']]
+            vector[pointer + offset + 1] = normalize(item['relative_distance'], 0, self.map_norm)
+            vector[pointer + offset + 2] = normalize_angle(relative_angle, 180)
 
         return vector
 
-    def _log_backprop_round(self):
-        self.step_count %= self.n_steps
-        if not self.step_count:
-            self.log.info(
-                f'Backprop Round Start: {self.backprop_round}')
-            self.backprop_round += 1
-        self.step_count += 1
-
-    def _log_episode_end(self):
-        state_dict = self.last_state
-        log_dict = {
-            'faces': self.total_faces,
-            'shoots': self.total_shoots,
-            'reward': self.total_reward,
-            'ammo': state_dict['player']['ammo'],
-            'episode_length': self.episode_length,
-            'enemy_health': sum(map(lambda x: x['health'], state_dict['enemies'])),
-            'player_health': state_dict['player']['health']
-        }
-        for i in self.action_freqs:
-            log_dict[self.action_names[i]] = self.action_freqs[i] / \
-                self.episode_length
-        wandb.log(log_dict)
-
-    def _compute_reward(self, action, next_state):
-        state_dict = self.last_state
-        next_state_dict = next_state
-
-        def _compute_face_reward(diff=5):
-            player_coordinate = next_state_dict['player']['x_position'], next_state_dict['player']['y_position']
-            face = False
-            for enemy in next_state_dict['enemies']:
-                enemy_coordinate = enemy['x_position'], enemy['y_position']
-                z = math.atan2(enemy_coordinate[1] - player_coordinate[1],
-                               enemy_coordinate[0] - player_coordinate[0]) * 180 / math.pi
-                if z < 0:
-                    z += 360
-                if z - diff <= next_state_dict['player']['z_position'] <= z + diff:
-                    face = True
-                    break
-            if face and self.action_names[action] == 'shoot':
-                ammo = state_dict['player']['ammo']
-                self.total_shoots += ammo and 1
-                return ammo and self.shoot_reward
-            elif face and not self.face:
-                self.total_faces += 1
-                self.face = True
-                return self.face_reward
-            self.face = False
-            return 0
-
-        enemy_kill_reward = len(
-            state_dict['enemies']) - len(next_state_dict['enemies'])
-        enemy_damage_reward = self.enemy_coeff * (sum(map(lambda x: x['health'], state_dict['enemies']))
-                                                  - sum(map(lambda x: x['health'], next_state_dict['enemies']))) / self.enemy_initial_health
-        player_damage_reward = -self.player_coeff * \
-            (state_dict['player']['health'] -
-             next_state_dict['player']['health']) / 100
-        ammo_loss_reward = -self.ammo_coeff * \
-            (state_dict['player']['ammo'] -
-             next_state_dict['player']['ammo']) / 200
-        good_behavior_reward = _compute_face_reward()
-        return enemy_kill_reward + enemy_damage_reward + player_damage_reward + ammo_loss_reward + good_behavior_reward
-
     def reset(self):
-        self.face = False
-        self.total_faces = 0
-        self.total_shoots = 0
-        self.total_reward = 0
-        self.episode_length = 0
-        self.action_freqs = {i: 0 for i in range(len(self.action_names))}
         state = state_queue.get()
         if state == {}:
+            self.last_state = None
             raise RuntimeError()
-        self._log_backprop_round()
-        self.enemy_initial_health = sum(
-            map(lambda x: x['health'], state['enemies']))
         self.last_state = state
         return self._vectorize_state(state)
 
     def step(self, action):
-        self.episode_length += 1
-        self._log_backprop_round()
-        self.action_freqs[action] += 1
         action_queue.put(action)
         next_state = state_queue.get()
+        if next_state == {}:
+            self.last_state = None
+            raise RuntimeError()
         performance = performance_queue.get()
         done = terminal_queue.get()
-        reward = (5 if performance else 0) if done \
-            else self._compute_reward(action, next_state)
-        done and self._log_episode_end()
         self.last_state = next_state
-        self.total_reward += reward
-        return self._vectorize_state(next_state), reward, done, {}
+        return self._vectorize_state(next_state), 0, done, {}
 
 
 class ThreadedProcessingExample(threading.Thread):
@@ -246,30 +215,26 @@ class TA2Agent(TA2Logic):
         # will attempt to cleanly end the experiment at the conclusion of the current episode,
         # or sooner if possible.
         self.end_experiment_early = False
-        self.env = VizDoomEnv(self.log)
-        self.device = th.device('cuda' if th.cuda.is_available() else 'cpu')
-        self.mask = th.Tensor([0, 0, 0, 1, 0, 1, 1, 1]).to(self.device)
-        self.n_steps = 100
-        self.total_timesteps = 10_000_000
-        self.model = A2C.load(
-            'a2c_0.zip', n_steps=self.n_steps, env=self.env, mask=self.mask)
+        
+        self.feature_vector = None
+        self.env = VizDoomEnv()
+        self.model = A2C.load('a2c_0.zip', env=self.env)
         self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'}, {'action': 'forward'}, {
             'action': 'backward'}, {'action': 'shoot'}, {'action': 'turn_left'}, {'action': 'turn_right'}]
-        self.feature_vector = None
         return
 
     def experiment_start(self):
         """This function is called when this TA2 has connected to a TA1 and is ready to begin
         the experiment.
         """
-        # self.log.info('Experiment Start')
+        self.log.info('Experiment Start')
         return
 
     def training_start(self):
         """This function is called when we are about to begin training on episodes of data in
         your chosen domain.
         """
-        # self.log.info('Training Start')
+        self.log.info('Training Start')
         return
 
     def training_episode_start(self, episode_number: int):
@@ -281,7 +246,7 @@ class TA2Agent(TA2Logic):
         episode_number : int
             This identifies the 0-based episode number you are about to begin training on.
         """
-        # self.log.info('Training Episode Start: #{}'.format(episode_number))
+        self.log.info('Training Episode Start: #{}'.format(episode_number))
         return
 
     def training_instance(self, feature_vector: dict, feature_label: dict) -> dict:
@@ -304,13 +269,9 @@ class TA2Agent(TA2Logic):
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
-        # self.log.debug('Training Instance: feature_vector={}  feature_label={}'.format(
-        #     feature_vector, feature_label))
-        if feature_label not in self.possible_answers:
-            self.possible_answers.append(copy.deepcopy(feature_label))
-
-        label_prediction = random.choice(self.possible_answers)
-
+        state_queue.put(feature_vector)
+        action = action_queue.get()
+        label_prediction = self.possible_answers[action]
         return label_prediction
 
     def training_performance(self, performance: float, feedback: dict = None):
@@ -324,7 +285,8 @@ class TA2Agent(TA2Logic):
             A dictionary that may provide additional feedback on your prediction based on the
             budget set in the TA1. If there is no feedback, the object will be None.
         """
-        # self.log.debug('Training Performance: {}'.format(performance))
+        performance_queue.put(performance)
+        terminal_queue.put(False)
         return
 
     def training_episode_end(self, performance: float, feedback: dict = None):
@@ -347,8 +309,10 @@ class TA2Agent(TA2Logic):
             Integer representing the predicted novelty level.
             A JSON-valid dict characterizing the novelty.
         """
-        # self.log.info(
-        #     'Training Episode End: performance={}'.format(performance))
+
+        state_queue.put(self.feature_vector)
+        performance_queue.put(performance)
+        terminal_queue.put(True)
 
         novelty_probability = random.random()
         novelty_threshold = 0.8
@@ -361,6 +325,7 @@ class TA2Agent(TA2Logic):
         """This function is called when we have completed the training episodes.
         """
         self.log.info('Training End')
+        state_queue.put({})
         return
 
     def train_model(self):
