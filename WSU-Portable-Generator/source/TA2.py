@@ -318,14 +318,7 @@ class TA2Agent(TA2Logic):
         episodes.
         """
         self.log.info('Testing Start')
-
-        def learn():
-            try:
-                self.model.learn(total_timesteps=self.total_timesteps)
-            except RuntimeError:
-                pass
-
-        thread = threading.Thread(target=learn)
+        thread = threading.Thread(target=lambda: self.workflow.run())
         thread.start()
 
         return
@@ -396,7 +389,6 @@ class TA2Agent(TA2Logic):
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
-        self.feature_vector = feature_vector
         state_queue.put(feature_vector)
         action = action_queue.get()
         label_prediction = self.possible_answers[action]
@@ -439,7 +431,7 @@ class TA2Agent(TA2Logic):
         self.log.info(
             'Testing Episode End: performance={}'.format(performance))
 
-        state_queue.put(self.feature_vector)
+        state_queue.put({})
         performance_queue.put(performance)
         terminal_queue.put(True)
 
@@ -454,7 +446,6 @@ class TA2Agent(TA2Logic):
         """This is called after the last episode of a trial has completed, before trial_end().
         """
         self.log.info('Testing End')
-        state_queue.put({})
         return
 
     def trial_end(self):
