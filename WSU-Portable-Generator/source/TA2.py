@@ -34,144 +34,54 @@ from stable_baselines3.a2c import A2C
 
 from objects.TA2_logic import TA2Logic
 
+
 state_queue = queue.Queue()
 action_queue = queue.Queue()
 performance_queue = queue.Queue()
 terminal_queue = queue.Queue()
 
 
-class VizDoomEnv(Env):
+class VizDoomDomain(BaseDomain):
 
-    def __init__(self):
-        super().__init__()
-        self.last_state = None
-        self.map_norm = 1000
-        self.health_norm = 100
-        self.rooms = [
-            {'x': (-512, -384), 'y': (-320, 320), 'index': [0, 5]},
-            {'x': (-320, 320), 'y': (-512, -384), 'index': [1, 7]},
-            {'x': (-320, 320), 'y': (384, 512), 'index': [2, 8]},
-            {'x': (384, 512), 'y': (-320, 320), 'index': [3, 6]},
-            {'x': (-320, 320), 'y': (-320, 320), 'index': [4, 5, 6, 7, 8]},
-            {'x': (-384, -320), 'y': (-64, 64), 'index': [5, 0, 4]},
-            {'x': (320, 384), 'y': (-64, 64), 'index': [6, 3, 4]},
-            {'x': (-64, 64), 'y': (-384, -320), 'index': [7, 1, 4]},
-            {'x': (-64, 64), 'y': (320, 384), 'index': [8, 2, 4]}
-        ]
-        self.item_types = {'health': 1, 'ammo': 0.5, 'trap': 0, 'obstacle': -0.5}
-        self.action_space = spaces.Discrete(8)
-        self.observation_space = spaces.Box(-1, 1, shape=(22,))
+    def __init__(self, config):
+        super().__init__(config)
+        self.last_obs = None
 
-    def _vectorize_state(self, obs):
+    def setup(self) -> bool:
+        return True
 
-        def get_room(obj):
-            x, y = obj['x_position'], obj['y_position']
-            for room in self.rooms:
-                if room['x'][0] <= x <= room['x'][1] \
-                        and room['y'][0] <= y <= room['y'][1]:
-                    return room['index']
+    def teardown(self) -> bool:
+        pass
 
-        def normalize(value, offset, norm):
-            return (value + offset) / (norm or 1)
+    def kickoff(self, config: dict) -> bool:
+        return True
 
-        def calculate_relative_angle(a, b):
-            if abs(a - b) < abs(a - b - 360):
-                return a - b
-            else:
-                return a - b - 360
-
-        def normalize_angle(angle, norm):
-            if angle > 180:
-                return (360 - angle) / norm
-            elif angle < -180:
-                return (angle + 360) / norm
-            else:
-                return angle / norm
-
-        vector = np.zeros(22) - 1
-        meta_data = dict()
-
-        vector[0] = normalize(obs['player']['x_position'], self.map_norm / 2, self.map_norm)
-        vector[1] = normalize(obs['player']['y_position'], self.map_norm / 2, self.map_norm)
-        vector[2] = normalize(obs['player']['angle'], 0, 360)
-        vector[3] = normalize(obs['player']['health'], 0, self.health_norm)
-        vector[4] = normalize(obs['player']['ammo'], 0, self.health_norm)
-
-        player = obs['player']
-        player_room = get_room(obs['player'])
-        player_coordinate = np.array([player['x_position'], player['y_position']])
-
-        relevant_enemies = []
-        meta_data['enemies_in_room'] = 0
-        for enemy in obs['enemies']:
-            enemy_room = get_room(enemy)
-            if enemy_room[0] in player_room:
-                meta_data['enemies_in_room'] += 1
-            enemy_coordinate = np.array([enemy['x_position'], enemy['y_position']])
-            dist = np.linalg.norm(player_coordinate - enemy_coordinate)
-            enemy['relative_distance'] = dist
-            relevant_enemies.append(enemy)
-        relevant_enemies = sorted(relevant_enemies, key=lambda x: x['relative_distance'])[:2]
-
-        pointer = 5
-        for i in range(len(relevant_enemies)):
-            offset = i * 4
-            enemy = relevant_enemies[i]
-            enemy_coordinate = np.array([enemy['x_position'], enemy['y_position']])
-            angle = math.atan2(enemy_coordinate[1] - player_coordinate[1],
-                               enemy_coordinate[0] - player_coordinate[0]) * 180 / math.pi
-            relative_angle = calculate_relative_angle(player['angle'], angle)
-            relative_aim_angle = calculate_relative_angle(enemy['angle'], angle)
-            vector[pointer + offset] = normalize(enemy['health'], 0, self.health_norm)
-            vector[pointer + offset + 1] = normalize(enemy['relative_distance'], 0, self.map_norm)
-            vector[pointer + offset + 2] = normalize_angle(relative_angle, 180)
-            vector[pointer + offset + 3] = normalize_angle(relative_aim_angle, 180)
-
-        relevant_items = []
-        for item_type in self.item_types:
-            for item in obs['items'][item_type]:
-                item_room = get_room(item)
-                if item_room[0] not in player_room:
-                    continue
-                item_coordinate = np.array([item['x_position'], item['y_position']])
-                dist = np.linalg.norm(player_coordinate - item_coordinate)
-                item['type'] = item_type
-                item['relative_distance'] = dist
-                relevant_items.append(item)
-        relevant_items = sorted(relevant_items, key=lambda x: x['relative_distance'])[:3]
-
-        pointer = 13
-        for i in range(len(relevant_items)):
-            offset = i * 3
-            item = relevant_items[i]
-            item_coordinate = np.array([item['x_position'], item['y_position']])
-            angle = math.atan2(item_coordinate[1] - player_coordinate[1],
-                               item_coordinate[0] - player_coordinate[0]) * 180 / math.pi
-            relative_angle = calculate_relative_angle(player['angle'], angle)
-            vector[pointer + offset] = self.item_types[item['type']]
-            vector[pointer + offset + 1] = normalize(item['relative_distance'], 0, self.map_norm)
-            vector[pointer + offset + 2] = normalize_angle(relative_angle, 180)
-
-        return vector
-
-    def reset(self):
-        state = state_queue.get()
-        if state == {}:
-            self.last_state = None
-            raise RuntimeError()
-        self.last_state = state
-        return self._vectorize_state(state)
-
-    def step(self, action):
-        action_queue.put(action)
-        next_state = state_queue.get()
-        if next_state == {}:
-            self.last_state = None
-            raise RuntimeError()
-        performance = performance_queue.get()
-        done = terminal_queue.get()
-        self.last_state = next_state
-        return self._vectorize_state(next_state), 0, done, {}
+    def communicate(self, message):
+        command = message['command']
+        if command == 'sense_all':
+            obs = state_queue.get()
+            self.last_obs = obs
+            return {
+                'command': command,
+                'current_pos': obs
+            }
+        elif command in self.game_engine.actions:
+            action_queue.put(command)
+            obs = state_queue.get() or self.last_obs
+            reward = performance_queue.get()
+            done = terminal_queue.get()
+            self.last_obs = obs
+            return {
+                'command': command,
+                'new_pos': obs,
+                'done': done,
+                'reward': reward
+            }
+        else:
+            return {
+                'command': command,
+                'message': "Invalid Command",
+            }
 
 
 class ThreadedProcessingExample(threading.Thread):
@@ -215,12 +125,45 @@ class TA2Agent(TA2Logic):
         # will attempt to cleanly end the experiment at the conclusion of the current episode,
         # or sooner if possible.
         self.end_experiment_early = False
-        
-        self.feature_vector = None
-        self.env = VizDoomEnv()
-        self.model = A2C.load('a2c_0.zip', env=self.env)
-        self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'}, {'action': 'forward'}, {
-            'action': 'backward'}, {'action': 'shoot'}, {'action': 'turn_left'}, {'action': 'turn_right'}]
+
+        self.env = VizDoomEnv(
+            domain=VizDoomDomain(config={}),
+            action_manager=VizDoomActionManager(
+                [
+                    VizDoomBasicAction({
+                        "command": "nothing"
+                    }),
+                    VizDoomBasicAction({
+                        "command": "left"
+                    }),
+                    VizDoomBasicAction({
+                        "command": "right"
+                    }),
+                    VizDoomBasicAction({
+                        "command": "backward"
+                    }),
+                    VizDoomBasicAction({
+                        "command": "forward"
+                    }),
+                    VizDoomBasicAction({
+                        "command": "shoot"
+                    }),
+                    VizDoomBasicAction({
+                        "command": "turn_left"
+                    }),
+                    VizDoomBasicAction({
+                        "command": "turn_right"
+                    })
+                ]
+            ),
+            reward_manager=VizDoomRewardManager(),
+            config={},
+        )
+        self.model = PPO.load('vizdoom_agent_baseline', self.env)
+        self.workflow = NoveltyDetectionWorkflow(self.env, config={'model': self.model})
+        self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'},
+                                 {'action': 'forward'}, {'action': 'backward'}, {'action': 'shoot'}, {'action': 'turn_left'},
+                                 {'action': 'turn_right'}]
         return
 
     def experiment_start(self):
@@ -269,9 +212,7 @@ class TA2Agent(TA2Logic):
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
-        state_queue.put(feature_vector)
-        action = action_queue.get()
-        label_prediction = self.possible_answers[action]
+        label_prediction = random.choice(self.possible_answers)
         return label_prediction
 
     def training_performance(self, performance: float, feedback: dict = None):
@@ -285,8 +226,7 @@ class TA2Agent(TA2Logic):
             A dictionary that may provide additional feedback on your prediction based on the
             budget set in the TA1. If there is no feedback, the object will be None.
         """
-        performance_queue.put(performance)
-        terminal_queue.put(False)
+        self.log.debug('Training Performance: {}'.format(performance))
         return
 
     def training_episode_end(self, performance: float, feedback: dict = None):
@@ -309,10 +249,7 @@ class TA2Agent(TA2Logic):
             Integer representing the predicted novelty level.
             A JSON-valid dict characterizing the novelty.
         """
-
-        state_queue.put(self.feature_vector)
-        performance_queue.put(performance)
-        terminal_queue.put(True)
+        self.log.info('Training Episode End: performance={}'.format(performance))
 
         novelty_probability = random.random()
         novelty_threshold = 0.8
@@ -325,7 +262,6 @@ class TA2Agent(TA2Logic):
         """This function is called when we have completed the training episodes.
         """
         self.log.info('Training End')
-        state_queue.put({})
         return
 
     def train_model(self):
@@ -375,8 +311,6 @@ class TA2Agent(TA2Logic):
         """
         self.log.info('Trial Start: #{}  novelty_desc: {}'.format(trial_number,
                                                                   str(novelty_description)))
-        if len(self.possible_answers) == 0:
-            self.possible_answers.append(dict({'action': 'left'}))
         return
 
     def testing_start(self):
