@@ -26,14 +26,16 @@ import queue
 import random
 import threading
 import time
-import math
-import torch as th
-import numpy as np
-from gym import Env, spaces
-from stable_baselines3.a2c import A2C
+from stable_baselines3 import PPO
+
+from general_sailon.framework.envs.base_domain import BaseDomain
+from general_sailon.domains.vizdoom.vizdoom_action_manager import VizDoomActionManager
+from general_sailon.domains.vizdoom.vizdoom_basic_action import VizDoomBasicAction
+from general_sailon.domains.vizdoom.vizdoom_env import VizDoomEnv
+from general_sailon.domains.vizdoom.vizdoom_reward_manager import VizDoomRewardManager
+from general_sailon.domains.vizdoom.vizdoom_workflow import NoveltyDetectionWorkflow
 
 from objects.TA2_logic import TA2Logic
-
 
 state_queue = queue.Queue()
 action_queue = queue.Queue()
@@ -45,6 +47,7 @@ class VizDoomDomain(BaseDomain):
 
     def __init__(self, config):
         super().__init__(config)
+        self.actions = ['nothing', 'left', 'right', 'forward', 'backward', 'shoot', 'turn_left', 'turn_right']
         self.last_obs = None
 
     def setup(self) -> bool:
@@ -65,7 +68,7 @@ class VizDoomDomain(BaseDomain):
                 'command': command,
                 'current_pos': obs
             }
-        elif command in self.game_engine.actions:
+        elif command in self.actions:
             action_queue.put(command)
             obs = state_queue.get() or self.last_obs
             reward = performance_queue.get()
@@ -162,7 +165,8 @@ class TA2Agent(TA2Logic):
         self.model = PPO.load('vizdoom_agent_baseline', self.env)
         self.workflow = NoveltyDetectionWorkflow(self.env, config={'model': self.model})
         self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'},
-                                 {'action': 'forward'}, {'action': 'backward'}, {'action': 'shoot'}, {'action': 'turn_left'},
+                                 {'action': 'forward'}, {'action': 'backward'}, {'action': 'shoot'},
+                                 {'action': 'turn_left'},
                                  {'action': 'turn_right'}]
         return
 
