@@ -20,8 +20,7 @@
 # **  Contact: Diane J. Cook (djcook@wsu.edu)                                                   ** #
 # ************************************************************************************************ #
 
-import copy
-import optparse
+import argparse
 import queue
 import random
 import threading
@@ -33,7 +32,7 @@ from general_sailon.domains.vizdoom.vizdoom_action_manager import VizDoomActionM
 from general_sailon.domains.vizdoom.vizdoom_basic_action import VizDoomBasicAction
 from general_sailon.domains.vizdoom.vizdoom_env import VizDoomEnv
 from general_sailon.domains.vizdoom.vizdoom_reward_manager import VizDoomRewardManager
-from general_sailon.domains.vizdoom.vizdoom_workflow import NoveltyDetectionWorkflow
+from general_sailon.domains.vizdoom.vizdoom_workflow import RunPPOWorkflow
 
 from objects.TA2_logic import TA2Logic
 
@@ -69,7 +68,7 @@ class VizDoomDomain(BaseDomain):
                 'current_pos': obs
             }
         elif command in self.actions:
-            action_queue.put(command)
+            action_queue.put(self.actions.index(command))
             obs = state_queue.get() or self.last_obs
             reward = performance_queue.get()
             done = terminal_queue.get()
@@ -162,13 +161,26 @@ class TA2Agent(TA2Logic):
             reward_manager=VizDoomRewardManager(),
             config={},
         )
-        self.model = PPO.load('vizdoom_agent_baseline', self.env)
-        self.workflow = NoveltyDetectionWorkflow(self.env, config={'model': self.model})
+        self.model = PPO('MlpPolicy', self.env)
+        self.config = self._get_workflow_config()
+        self.workflow = RunPPOWorkflow(self.env, config=self.config)
         self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'},
                                  {'action': 'forward'}, {'action': 'backward'}, {'action': 'shoot'},
-                                 {'action': 'turn_left'},
-                                 {'action': 'turn_right'}]
+                                 {'action': 'turn_left'}, {'action': 'turn_right'}]
         return
+
+    @staticmethod
+    def _get_workflow_config():
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--total_steps', type=int, nargs='?', default=10000000)
+        parser.add_argument('--eval_freq', type=int, nargs='?', default=100000)
+        parser.add_argument('--novelty_level', type=int, nargs='?', default=0)
+        parser.add_argument('--issue_start', type=bool, nargs='?', default=True)
+        parser.add_argument('--tensorboard_log', type=str, nargs='?', default='./logdir/vizdoom_train')
+        parser.add_argument('--save_path', type=str, nargs='?', default='./')
+        parser.add_argument('--model', type=str, nargs='?', default=None)
+        config, _ = parser.parse_known_args()
+        return config
 
     def experiment_start(self):
         """This function is called when this TA2 has connected to a TA1 and is ready to begin
