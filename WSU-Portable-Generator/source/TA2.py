@@ -163,8 +163,7 @@ class TA2Agent(TA2Logic):
             reward_manager=VizDoomRewardManager(),
             config={},
         )
-        self.model = PPO('MlpPolicy', self.env)
-        self.workflow = NoveltyDetectionWorkflow(self.env, config={'model': self.model})
+        self.workflow = NoveltyDetectionWorkflow(self.env, config=argparse.Namespace(model = "vizdoom_baseline.zip"))
         self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'},
                                  {'action': 'forward'}, {'action': 'backward'}, {'action': 'shoot'},
                                  {'action': 'turn_left'}, {'action': 'turn_right'}]
