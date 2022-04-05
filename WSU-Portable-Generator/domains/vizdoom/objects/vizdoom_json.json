@@ -1,0 +1,180 @@
+{
+  "player": {
+    "prop_continuous": {
+      "health": {
+        "dtype": "float",
+        "min": 0,
+        "max": 100.0
+      },
+      "ammo": {
+        "dtype": "float",
+        "min": 0,
+        "max": 20.0
+      },
+      "uid": {
+        "dtype": "int",
+        "min": 0,
+        "max": 0
+      }
+    },
+    "prop_discrete": {
+      "type": {
+        "min_set": [
+          0
+        ],
+        "mapping": {
+          "0": "player"
+        }
+      }
+    },
+    "max_num_entities": 1,
+    "hashables": [
+      "uid"
+    ]
+  },
+  "ZombieMan": {
+    "prop_continuous": {
+      "health": {
+        "dtype": "float",
+        "min": 0,
+        "max": 10.0
+      },
+      "uid": {
+        "dtype": "int",
+        "min": 1,
+        "max": 29
+      },
+      "relative_distance_to_player": {
+        "dtype": "float",
+        "min": 0,
+        "max": 1000
+      }
+    },
+    "prop_discrete": {
+      "type": {
+        "min_set": [
+          0
+        ],
+        "mapping": {
+          "0": "ZombieMan"
+        }
+      }
+    },
+    "max_num_entities": 4,
+    "hashables": [
+      "uid"
+    ]
+  },
+  "obstacle": {
+    "prop_continuous": {
+      "uid": {
+        "dtype": "int",
+        "min": 1,
+        "max": 29
+      },
+      "relative_distance_to_player": {
+        "dtype": "float",
+        "min": 0,
+        "max": 1000
+      }
+    },
+    "prop_discrete": {
+      "type": {
+        "min_set": [
+          0
+        ],
+        "mapping": {
+          "0": "obstacle"
+        }
+      }
+    },
+    "max_num_entities": 6,
+    "hashables": [
+      "uid"
+    ]
+  },
+  "trap": {
+    "prop_continuous": {
+      "uid": {
+        "dtype": "int",
+        "min": 1,
+        "max": 29
+      },
+      "relative_distance_to_player": {
+        "dtype": "float",
+        "min": 0,
+        "max": 1000
+      }
+    },
+    "prop_discrete": {
+      "type": {
+        "min_set": [
+          0
+        ],
+        "mapping": {
+          "0": "trap"
+        }
+      }
+    },
+    "max_num_entities": 6,
+    "hashables": [
+      "uid"
+    ]
+  },
+  "health": {
+    "prop_continuous": {
+      "uid": {
+        "dtype": "int",
+        "min": 1,
+        "max": 29
+      },
+      "relative_distance_to_player": {
+        "dtype": "float",
+        "min": 0,
+        "max": 1000
+      }
+    },
+    "prop_discrete": {
+      "type": {
+        "min_set": [
+          0
+        ],
+        "mapping": {
+          "0": "health"
+        }
+      }
+    },
+    "max_num_entities": 6,
+    "hashables": [
+      "uid"
+    ]
+  },
+  "ammo": {
+    "prop_continuous": {
+      "uid": {
+        "dtype": "int",
+        "min": 1,
+        "max": 29
+      },
+      "relative_distance_to_player": {
+        "dtype": "float",
+        "min": 0,
+        "max": 1000
+      }
+    },
+    "prop_discrete": {
+      "type": {
+        "min_set": [
+          0
+        ],
+        "mapping": {
+          "0": "ammo"
+        }
+      }
+    },
+    "max_num_entities": 6,
+    "hashables": [
+      "uid"
+    ]
+  }
+}
