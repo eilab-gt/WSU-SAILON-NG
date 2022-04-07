@@ -1,0 +1,3 @@
+[submodule "general-sailon"]
+	path = general-sail-on
+	url = https://github.gatech.edu/EntertainmentIntelligenceLab/general-sail-on.git
