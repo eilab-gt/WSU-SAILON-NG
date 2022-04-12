@@ -20,72 +20,32 @@
 # **  Contact: Diane J. Cook (djcook@wsu.edu)                                                   ** #
 # ************************************************************************************************ #
 
-import argparse
 import queue
 import random
 import threading
 import time
+import math
+import numpy as np
+from gym import spaces, Env
 from stable_baselines3 import PPO
-
-from general_sailon.framework.envs.base_domain import BaseDomain
-from general_sailon.domains.vizdoom.vizdoom_action_manager import VizDoomActionManager
-from general_sailon.domains.vizdoom.vizdoom_basic_action import VizDoomBasicAction
-from general_sailon.domains.vizdoom.vizdoom_env import VizDoomEnv
-from general_sailon.domains.vizdoom.vizdoom_reward_manager import VizDoomRewardManager
-from general_sailon.domains.vizdoom.vizdoom_workflow import RunPPOWorkflow, NoveltyDetectionWorkflow
 
 from objects.TA2_logic import TA2Logic
 
-state_queue = queue.Queue()
-action_queue = queue.Queue()
-performance_queue = queue.Queue()
-terminal_queue = queue.Queue()
 
+class VizDoomEnv(Env):
 
-class VizDoomDomain(BaseDomain):
+    def __init__(self):
+        self.observation_space = spaces.Box(-1, 1, shape=(22,))
+        self.action_space = spaces.Discrete(8)
 
-    def __init__(self, config):
-        super().__init__(config)
-        self.actions = {'nothing': 0, 'left': 1, 'right': 2,
-                        'forward': 3, 'backward': 4, 'shoot': 5,
-                        'turn_left': 6, 'turn_right': 7}
-        self.last_obs = None
-
-    def setup(self) -> bool:
-        return True
-
-    def teardown(self) -> bool:
+    def reset(self):
         pass
 
-    def kickoff(self, config: dict) -> bool:
-        return True
+    def step(self, action):
+        pass
 
-    def communicate(self, message):
-        command = message['command']
-        if command == 'sense_all':
-            obs = state_queue.get()
-            self.last_obs = obs
-            return {
-                'command': command,
-                'current_pos': obs
-            }
-        elif command in self.actions:
-            action_queue.put(self.actions[command])
-            obs = state_queue.get() or self.last_obs
-            reward = performance_queue.get()
-            done = terminal_queue.get()
-            self.last_obs = obs
-            return {
-                'command': command,
-                'new_pos': obs,
-                'done': done,
-                'reward': reward
-            }
-        else:
-            return {
-                'command': command,
-                'message': "Invalid Command",
-            }
+    def render(self, mode="human"):
+        pass
 
 
 class ThreadedProcessingExample(threading.Thread):
@@ -118,6 +78,7 @@ class ThreadedProcessingExample(threading.Thread):
 
 
 class TA2Agent(TA2Logic):
+
     def __init__(self):
         super().__init__()
 
@@ -130,44 +91,116 @@ class TA2Agent(TA2Logic):
         # or sooner if possible.
         self.end_experiment_early = False
 
-        self.env = VizDoomEnv(
-            domain=VizDoomDomain(config={}),
-            action_manager=VizDoomActionManager(
-                [
-                    VizDoomBasicAction({
-                        "command": "nothing"
-                    }),
-                    VizDoomBasicAction({
-                        "command": "left"
-                    }),
-                    VizDoomBasicAction({
-                        "command": "right"
-                    }),
-                    VizDoomBasicAction({
-                        "command": "backward"
-                    }),
-                    VizDoomBasicAction({
-                        "command": "forward"
-                    }),
-                    VizDoomBasicAction({
-                        "command": "shoot"
-                    }),
-                    VizDoomBasicAction({
-                        "command": "turn_left"
-                    }),
-                    VizDoomBasicAction({
-                        "command": "turn_right"
-                    })
-                ]
-            ),
-            reward_manager=VizDoomRewardManager(),
-            config={},
-        )
-        self.workflow = NoveltyDetectionWorkflow(self.env, config=argparse.Namespace(model = "vizdoom_baseline.zip"))
+        self.env = VizDoomEnv()
+        self.model = PPO('MlpPolicy', self.env)
+        # self.model.set_parameters('vizdoom_model.zip')
+        self.feature_vector = None
+        self.map_norm = 1000
+        self.health_norm = 100
+        self.ammo_norm = 100
+        self.rooms = [
+            {'x': (-512, -384), 'y': (-320, 320), 'index': [0, 5]},
+            {'x': (-320, 320), 'y': (-512, -384), 'index': [1, 7]},
+            {'x': (-320, 320), 'y': (384, 512), 'index': [2, 8]},
+            {'x': (384, 512), 'y': (-320, 320), 'index': [3, 6]},
+            {'x': (-320, 320), 'y': (-320, 320), 'index': [4, 5, 6, 7, 8]},
+            {'x': (-384, -320), 'y': (-64, 64), 'index': [5, 0, 4]},
+            {'x': (320, 384), 'y': (-64, 64), 'index': [6, 3, 4]},
+            {'x': (-64, 64), 'y': (-384, -320), 'index': [7, 1, 4]},
+            {'x': (-64, 64), 'y': (320, 384), 'index': [8, 2, 4]}
+        ]
+        self.item_types = {'health': 1, 'ammo': 0.5, 'trap': 0, 'obstacle': -0.5}
         self.possible_answers = [{'action': 'nothing'}, {'action': 'left'}, {'action': 'right'},
                                  {'action': 'forward'}, {'action': 'backward'}, {'action': 'shoot'},
                                  {'action': 'turn_left'}, {'action': 'turn_right'}]
         return
+
+    def _vectorize_state(self, obs):
+
+        def get_room(obj):
+            x, y = obj['x_position'], obj['y_position']
+            for room in self.rooms:
+                if room['x'][0] <= x <= room['x'][1] \
+                        and room['y'][0] <= y <= room['y'][1]:
+                    return room['index']
+
+        def normalize(value, offset, norm):
+            return (value + offset) / (norm or 1)
+
+        def calculate_relative_angle(a, b):
+            if abs(a - b) < abs(a - b - 360):
+                return a - b
+            else:
+                return a - b - 360
+
+        def normalize_angle(angle, norm):
+            if angle > 180:
+                return (360 - angle) / norm
+            elif angle < -180:
+                return (angle + 360) / norm
+            else:
+                return angle / norm
+
+        vector = np.zeros(22) - 1
+
+        vector[0] = normalize(obs['player']['x_position'], self.map_norm / 2, self.map_norm)
+        vector[1] = normalize(obs['player']['y_position'], self.map_norm / 2, self.map_norm)
+        vector[2] = normalize(obs['player']['angle'], 0, 360)
+        vector[3] = normalize(obs['player']['health'], 0, self.health_norm)
+        vector[4] = normalize(obs['player']['ammo'], 0, self.ammo_norm)
+
+        player = obs['player']
+        player_room = get_room(player)
+        player_coordinate = np.array([player['x_position'], player['y_position']])
+
+        relevant_enemies = []
+        for enemy in obs['enemies']:
+            enemy_coordinate = np.array([enemy['x_position'], enemy['y_position']])
+            dist = np.linalg.norm(player_coordinate - enemy_coordinate)
+            enemy['relative_distance'] = dist
+            relevant_enemies.append(enemy)
+        relevant_enemies = sorted(relevant_enemies, key=lambda x: x['relative_distance'])[:2]
+
+        pointer = 5
+        for i in range(len(relevant_enemies)):
+            offset = i * 4
+            enemy = relevant_enemies[i]
+            enemy_coordinate = np.array([enemy['x_position'], enemy['y_position']])
+            angle = math.atan2(enemy_coordinate[1] - player_coordinate[1],
+                               enemy_coordinate[0] - player_coordinate[0]) * 180 / math.pi
+            relative_angle = calculate_relative_angle(player['angle'], angle)
+            relative_aim_angle = calculate_relative_angle(enemy['angle'], angle)
+            vector[pointer + offset] = normalize(enemy['health'], 0, self.health_norm)
+            vector[pointer + offset + 1] = normalize(enemy['relative_distance'], 0, self.map_norm)
+            vector[pointer + offset + 2] = normalize_angle(relative_angle, 180)
+            vector[pointer + offset + 3] = normalize_angle(relative_aim_angle, 180)
+
+        relevant_items = []
+        for item_type in self.item_types:
+            for item in obs['items'][item_type]:
+                item_room = get_room(item)
+                if item_room[0] not in player_room:
+                    continue
+                item_coordinate = np.array([item['x_position'], item['y_position']])
+                dist = np.linalg.norm(player_coordinate - item_coordinate)
+                item['type'] = item_type
+                item['relative_distance'] = dist
+                relevant_items.append(item)
+        relevant_items = sorted(relevant_items, key=lambda x: x['relative_distance'])[:3]
+
+        pointer = 13
+        for i in range(len(relevant_items)):
+            offset = i * 3
+            item = relevant_items[i]
+            item_coordinate = np.array([item['x_position'], item['y_position']])
+            angle = math.atan2(item_coordinate[1] - player_coordinate[1],
+                               item_coordinate[0] - player_coordinate[0]) * 180 / math.pi
+            relative_angle = calculate_relative_angle(player['angle'], angle)
+            vector[pointer + offset] = self.item_types[item['type']]
+            vector[pointer + offset + 1] = normalize(item['relative_distance'], 0, self.map_norm)
+            vector[pointer + offset + 2] = normalize_angle(relative_angle, 180)
+
+        return vector
 
     def experiment_start(self):
         """This function is called when this TA2 has connected to a TA1 and is ready to begin
@@ -321,9 +354,6 @@ class TA2Agent(TA2Logic):
         episodes.
         """
         self.log.info('Testing Start')
-        thread = threading.Thread(target=lambda: self.workflow.run())
-        thread.start()
-
         return
 
     def testing_episode_start(self, episode_number: int):
@@ -392,9 +422,10 @@ class TA2Agent(TA2Logic):
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
-        state_queue.put(feature_vector)
-        action = action_queue.get()
+        observation = self._vectorize_state(feature_vector)
+        action, _ = self.model.predict(observation)
         label_prediction = self.possible_answers[action]
+        print(label_prediction)
         return label_prediction
 
     def testing_performance(self, performance: float, feedback: dict = None):
@@ -408,8 +439,6 @@ class TA2Agent(TA2Logic):
             A dictionary that may provide additional feedback on your prediction based on the
             budget set in the TA1. If there is no feedback, the object will be None.
         """
-        performance_queue.put(performance)
-        terminal_queue.put(False)
         return
 
     def testing_episode_end(self, performance: float, feedback: dict = None):
@@ -433,10 +462,6 @@ class TA2Agent(TA2Logic):
         """
         self.log.info(
             'Testing Episode End: performance={}'.format(performance))
-
-        state_queue.put({})
-        performance_queue.put(performance)
-        terminal_queue.put(True)
 
         novelty_probability = random.random()
         novelty_threshold = 0.8
