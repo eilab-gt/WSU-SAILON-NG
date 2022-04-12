@@ -424,7 +424,6 @@ class TA2Agent(TA2Logic):
         observation = self._vectorize_state(feature_vector)
         action, _ = self.model.predict(observation)
         label_prediction = self.possible_answers[action]
-        print(label_prediction)
         return label_prediction
 
     def testing_performance(self, performance: float, feedback: dict = None):
