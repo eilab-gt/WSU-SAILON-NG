@@ -94,7 +94,6 @@ class TA2Agent(TA2Logic):
         self.env = VizDoomEnv()
         self.model = PPO('MlpPolicy', self.env)
         # self.model.set_parameters('vizdoom_model.zip')
-        self.feature_vector = None
         self.map_norm = 1000
         self.health_norm = 100
         self.ammo_norm = 100
