@@ -1,0 +1,276 @@
+{
+    "player": {
+        "prop_continuous": {
+            "x_position": {
+                "dtype": "float",
+                "min": -44,
+                "max": 304
+            },
+            "y_position": {
+                "dtype": "float",
+                "min": -305,
+                "max": 405
+            },
+            "z_position": {
+                "dtype": "float",
+                "min": -1.0,
+                "max": 1.0
+            },
+            "health": {
+                "dtype": "float",
+                "min": 0,
+                "max": 101.0
+            },
+            "ammo": {
+                "dtype": "float",
+                "min": -1,
+                "max": 21.0
+            },
+            "uid": {
+                "dtype": "int",
+                "min": -1,
+                "max": 1
+            }
+        },
+        "prop_discrete": {
+            "type": {
+                "min_set": [
+                    0,
+                    "0"
+                ],
+                "mapping": {
+                    "0": "player"
+                }
+            }
+        },
+        "max_num_entities": 1,
+        "hashables": [
+            "uid"
+        ]
+    },
+    "ZombieMan": {
+        "prop_continuous": {
+            "x_position": {
+                "dtype": "float",
+                "min": -493,
+                "max": 492
+            },
+            "y_position": {
+                "dtype": "float",
+                "min": -492,
+                "max": 493
+            },
+            "z_position": {
+                "dtype": "float",
+                "min": -1.0,
+                "max": 1.0
+            },
+            "health": {
+                "dtype": "float",
+                "min": 0,
+                "max": 11.0
+            },
+            "uid": {
+                "dtype": "int",
+                "min": 0,
+                "max": 4
+            },
+            "relative_distance_to_player": {
+                "dtype": "float",
+                "min": 39,
+                "max": 957
+            }
+        },
+        "prop_discrete": {
+            "type": {
+                "min_set": [
+                    0,
+                    "0"
+                ],
+                "mapping": {
+                    "0": "ZombieMan"
+                }
+            }
+        },
+        "max_num_entities": 4,
+        "hashables": [
+            "uid"
+        ]
+    },
+    "obstacle": {
+        "prop_continuous": {
+            "x_position": {
+                "dtype": "float",
+                "min": -435,
+                "max": 117
+            },
+            "y_position": {
+                "dtype": "float",
+                "min": -447,
+                "max": 236
+            },
+            "z_position": {
+                "dtype": "float",
+                "min": -1.0,
+                "max": 1.0
+            },
+            "uid": {
+                "dtype": "int",
+                "min": 2,
+                "max": 8
+            },
+            "relative_distance_to_player": {
+                "dtype": "float",
+                "min": 45,
+                "max": 758
+            }
+        },
+        "prop_discrete": {
+            "type": {
+                "min_set": [
+                    0,
+                    "0"
+                ],
+                "mapping": {
+                    "0": "obstacle"
+                }
+            }
+        },
+        "max_num_entities": 4,
+        "hashables": [
+            "uid"
+        ]
+    },
+    "trap": {
+        "prop_continuous": {
+            "x_position": {
+                "dtype": "float",
+                "min": -447,
+                "max": 182
+            },
+            "y_position": {
+                "dtype": "float",
+                "min": -430,
+                "max": 179
+            },
+            "z_position": {
+                "dtype": "float",
+                "min": -1.0,
+                "max": 1.0
+            },
+            "uid": {
+                "dtype": "int",
+                "min": 5,
+                "max": 9
+            },
+            "relative_distance_to_player": {
+                "dtype": "float",
+                "min": 221,
+                "max": 784
+            }
+        },
+        "prop_discrete": {
+            "type": {
+                "min_set": [
+                    0,
+                    "0"
+                ],
+                "mapping": {
+                    "0": "trap"
+                }
+            }
+        },
+        "max_num_entities": 4,
+        "hashables": [
+            "uid"
+        ]
+    },
+    "health": {
+        "prop_continuous": {
+            "x_position": {
+                "dtype": "float",
+                "min": -458,
+                "max": 252
+            },
+            "y_position": {
+                "dtype": "float",
+                "min": -478,
+                "max": 485
+            },
+            "z_position": {
+                "dtype": "float",
+                "min": -1.0,
+                "max": 1.0
+            },
+            "uid": {
+                "dtype": "int",
+                "min": 7,
+                "max": 13
+            },
+            "relative_distance_to_player": {
+                "dtype": "float",
+                "min": 172,
+                "max": 804
+            }
+        },
+        "prop_discrete": {
+            "type": {
+                "min_set": [
+                    0,
+                    "0"
+                ],
+                "mapping": {
+                    "0": "health"
+                }
+            }
+        },
+        "max_num_entities": 4,
+        "hashables": [
+            "uid"
+        ]
+    },
+    "ammo": {
+        "prop_continuous": {
+            "x_position": {
+                "dtype": "float",
+                "min": -242,
+                "max": 492
+            },
+            "y_position": {
+                "dtype": "float",
+                "min": 92,
+                "max": 237
+            },
+            "z_position": {
+                "dtype": "float",
+                "min": -1.0,
+                "max": 1.0
+            },
+            "uid": {
+                "dtype": "int",
+                "min": 10,
+                "max": 14
+            },
+            "relative_distance_to_player": {
+                "dtype": "float",
+                "min": 200,
+                "max": 629
+            }
+        },
+        "prop_discrete": {
+            "type": {
+                "min_set": [
+                    0,
+                    "0"
+                ],
+                "mapping": {
+                    "0": "ammo"
+                }
+            }
+        },
+        "max_num_entities": 4,
+        "hashables": [
+            "uid"
+        ]
+    }
+}

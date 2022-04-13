@@ -28,7 +28,7 @@ import math
 import numpy as np
 from gym import spaces, Env
 from stable_baselines3 import PPO
-
+from vizdoom_simple_novelty_detector import VizdoomSimpleNoveltyDetector
 from objects.TA2_logic import TA2Logic
 
 
@@ -90,10 +90,10 @@ class TA2Agent(TA2Logic):
         # will attempt to cleanly end the experiment at the conclusion of the current episode,
         # or sooner if possible.
         self.end_experiment_early = False
-
+        self.novelty_detector = VizdoomSimpleNoveltyDetector()
         self.env = VizDoomEnv()
         self.model = PPO('MlpPolicy', self.env)
-        # self.model.set_parameters('vizdoom_model.zip')
+        self.model.set_parameters('vizdoom_baseline.zip')
         self.map_norm = 1000
         self.health_norm = 100
         self.ammo_norm = 100
@@ -421,9 +421,21 @@ class TA2Agent(TA2Logic):
             A dictionary of your label prediction of the format {'action': label}.  This is
                 strictly enforced and the incorrect format will result in an exception being thrown.
         """
+        ##model funcs
         observation = self._vectorize_state(feature_vector)
         action, _ = self.model.predict(observation)
         label_prediction = self.possible_answers[action]
+        
+        #novelty
+        
+        state_valid_info = self.novelty_detector.on_step_result(feature_vector)
+        if state_valid_info:
+            #if there's info that we've returned
+            self.novelty_probability, self.threshold, self.novelty, self.characterization = state_valid_info
+        else:
+            #no novelty
+            self.novelty_probability, self.threshold, self.novelty, self.characterization = 0, 0, 0, {}
+        
         return label_prediction
 
     def testing_performance(self, performance: float, feedback: dict = None):
@@ -461,12 +473,12 @@ class TA2Agent(TA2Logic):
         self.log.info(
             'Testing Episode End: performance={}'.format(performance))
 
-        novelty_probability = random.random()
-        novelty_threshold = 0.8
-        novelty = random.choice(list(range(4)))
-        novelty_characterization = dict()
-
-        return novelty_probability, novelty_threshold, novelty, novelty_characterization
+        # novelty_probability = random.random()
+        # novelty_threshold = 0.8
+        # novelty = random.choice(list(range(4)))
+        # novelty_characterization = dict()
+        self.log.info("NOVELTY INFO: %s, %s, %s, %s", (self.novelty_probability, self.threshold, self.novelty, self.characterization))
+        return self.novelty_probability, self.threshold, self.novelty, self.characterization
 
     def testing_end(self):
         """This is called after the last episode of a trial has completed, before trial_end().
