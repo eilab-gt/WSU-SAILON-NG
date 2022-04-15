@@ -36,7 +36,7 @@ some Python setup, which we describe below based on the Anaconda environment.
 ```
 4.  Create a new environment with the basic versions.
 ```
-(base) [user@host ~]$ conda create --name aiq-env python=3.7 python-dateutil==2.8.1 psutil pytz
+(base) [user@host ~]$ conda create --name aiq-env python=3.7 python-dateutil==2.8.1 psutil pytz numpy
 ```
 5.  Activate the new environment so we can finish installing the remaining packages.
 ```
@@ -44,7 +44,7 @@ some Python setup, which we describe below based on the Anaconda environment.
 ```
 6.  Install the remaining packages with pip.
 ```
-(aiq-env) [user@host ~]$ pip install pika==1.1.0
+(aiq-env) [user@host ~]$ pip install pika==1.1.0 blosc==1.10.4
 ```
 
 <a name="configurationfile">
@@ -77,7 +77,18 @@ experiment with all novelty levels, contact us for different credentials.
 *  `description` is an optional field that will be recorded and associated
     with the experiment instance that is run.
     
-*  `seed` is an optional field that will seed the environment for consistency.
+* `seed` is an optional integer that will provide the random seed used when building an experiment
+    so that you can always build the same experiment.
+
+* `episode_seed` is an optional integer that will overwrite the experiment setting and force EVERY
+    episode to use this seed value.
+
+* `start_zeroed_out` is an optional boolean (default=`False`) for the CartPole domain that will
+    have your cart physics start zeroed out when set to `True`.
+
+* `start_world_state` is an optional JSON string that is converted to a dictionary representing the
+    starting world state for the CartPole domain.  The string is converted using `json.loads(val)`
+    and will throw an exception if the string is not a valid dictionary.
 
 ### [sail-on]
 

@@ -9,6 +9,7 @@
 * [Novelty Indicator](#noveltyindicator)
 * [Novelty Characterization](#noveltycharacterization)
 * [Sample (Mock) Novelty](#samplemocknovelty)
+* [Phase 1 Revealed Novelty](#phase1revealednovelty)
 * [Frequently Asked Questions](#faq)
 
 <a name="taskdescription">
@@ -118,6 +119,22 @@ also called Mock novelties. These are described below.
 * Level 3: Activity not seen in pre-novelty, but seen in post-novelty.
 * Level 4: Two sensor values always give same reading.
 * Level 5: Second inhabitant simulated by overlaying copy of existing inhabitant.
+
+<a name="phase1revealednovelty">
+
+## Phase 1 Revealed Novelty
+
+* Level 1 (Class): Not revealed (too close to Phase 2 novelty)
+* Level 2 (Attribute): Sensors inactive in pre-novelty become active post-novelty
+  * No Novelty: 0 inactive sensors become active
+  * Easy: 5 inactive sensors become active
+  * Medium: 10 inactive sensors become active
+  * Hard: All inactive sensors become active (15-20 depending on floorplan)
+* Level 3 (Representation): Partition floorplan into areas; all sensors in area have same value
+  * No novelty: # areas = # sensors
+  * Easy: Floorplan partitioned into 10 areas
+  * Medium: Floorplan partitioned into 8 areas
+  * Hard: Floorplan partitioned into 5 areas
 
 <a name="faq">
 
