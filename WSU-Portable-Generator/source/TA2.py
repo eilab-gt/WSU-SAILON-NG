@@ -93,7 +93,7 @@ class TA2Agent(TA2Logic):
 
         self.env = VizDoomEnv()
         self.model = PPO('MlpPolicy', self.env)
-        # self.model.set_parameters('vizdoom_model.zip')
+        self.model.set_parameters('vizdoom_baseline.zip')
         self.map_norm = 1000
         self.health_norm = 100
         self.ammo_norm = 100
@@ -146,7 +146,7 @@ class TA2Agent(TA2Logic):
         vector[1] = normalize(obs['player']['y_position'], self.map_norm / 2, self.map_norm)
         vector[2] = normalize(obs['player']['angle'], 0, 360)
         vector[3] = normalize(obs['player']['health'], 0, self.health_norm)
-        vector[4] = normalize(obs['player']['ammo'], 0, self.ammo_norm)
+        vector[4] = normalize(obs['player']['ammo'], 0, 0)
 
         player = obs['player']
         player_room = get_room(player)
