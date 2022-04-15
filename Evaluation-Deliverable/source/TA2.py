@@ -26,6 +26,9 @@ import queue
 import random
 import threading
 import time
+from stable_baselines3 import A2C
+import numpy as np
+import math
 
 from objects.TA2_logic import TA2Logic
 
@@ -66,12 +69,71 @@ class TA2Agent(TA2Logic):
         self.possible_answers = list()
         # This variable can be set to true and the system will attempt to end training at the
         # completion of the current episode, or sooner if possible.
-        self.end_training_early = False
+        self.end_training_early = True
         # This variable is checked only during the evaluation phase.  If set to True the system
         # will attempt to cleanly end the experiment at the conclusion of the current episode,
         # or sooner if possible.
         self.end_experiment_early = False
+
+        # If you need values from the command line, you can get values from your custom options
+        # here.  Set custom options in the _add_ta2_command_line_options() function.
+        options = self._get_command_line_options()
+        my_custom_value = options.custom_value
+        self.log.debug('Command line custom value is: {}'.format(my_custom_value))
         return
+    @staticmethod
+    def _vectorize_state(state):
+
+        def _vectorize_object(obj):
+            vector = []
+            for key in obj:
+                if key == 'id' or type(obj[key]) is str:
+                    continue
+                vector.append(obj[key])
+            return np.array(vector)
+
+        def _vectorize_list(lst):
+            vector = []
+            for obj in lst:
+                vector.append(_vectorize_object(obj))
+            return np.array(vector).reshape(-1)
+
+        vector = np.zeros(90)
+        vector[0:len(state['enemies']) * 5] = _vectorize_list(state['enemies'])
+        vector[20:20 + len(state['items']['health']) *
+               4] = _vectorize_list(state['items']['health'])
+        vector[36:36 + len(state['items']['ammo']) *
+               4] = _vectorize_list(state['items']['ammo'])
+        vector[52:52 + len(state['items']['trap']) *
+               4] = _vectorize_list(state['items']['trap'])
+        vector[68:68 + len(state['items']['obstacle']) *
+               4] = _vectorize_list(state['items']['obstacle'])
+        vector[84:] = _vectorize_object(state['player'])
+        return vector
+
+    def _add_ta2_command_line_options(self, parser: optparse.OptionParser):
+        """If you do not want to use this function, you can remove it from TA2.py to clean up
+        your code.  This is already defined in the parent class.
+
+        This function allows you to easily add custom arguments to the command line parser.  To
+        see what is already defined, please see the _add_command_line_options() function in the
+        parent class found in options/TA2_logic.py.
+
+        Parameters
+        ----------
+        parser : optparse.OptionParser
+            This is the command line parser object, you can add custom entries to it here.
+
+        Returns
+        -------
+        optparse.OptionParser
+            The parser object that you have added additional options to.
+        """
+        parser.add_option("--custom-value",
+                          dest="custom_value",
+                          help="Example for adding custom options to the command line parser.",
+                          default="HelloWorld!")
+        return parser
 
     def experiment_start(self):
         """This function is called when this TA2 has connected to a TA1 and is ready to begin
@@ -234,6 +296,7 @@ class TA2Agent(TA2Logic):
         episodes.
         """
         self.log.info('Testing Start')
+        self.model = A2C.load('submission.zip')
         return
 
     def testing_episode_start(self, episode_number: int):
@@ -306,7 +369,7 @@ class TA2Agent(TA2Logic):
             feature_vector, novelty_indicator))
 
         # Return dummy random choices, but should be determined by trained model
-        label_prediction = random.choice(self.possible_answers)
+        label_prediction = self.model.predict(self._vectorize_state(feature_vector))
 
         return label_prediction
 

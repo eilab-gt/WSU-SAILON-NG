@@ -1,1 +1,3 @@
 wandb
+**.objects/__pycache__/
+*.pyc
