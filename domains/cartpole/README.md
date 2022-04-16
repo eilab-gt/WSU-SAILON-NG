@@ -9,6 +9,7 @@
 * [Novelty Indicator](#noveltyindicator)
 * [Novelty Characterization](#noveltycharacterization)
 * [Sample (Mock) Novelty](#samplemocknovelty)
+* [Phase 1 Revealed Novelty](#phase1revealednovelty)
 * [Frequently Asked Questions](#faq)
 
 <a name="taskdescription">
@@ -22,7 +23,7 @@ by pushing the cart forward, backward, left or right. The cart is constrained to
 in a 2D plane. The pole is affixed to the cart and can move around that fixed point
 in any direction. There are other objects in the environment that move in 3D and may
 collide with cart, pole, walls, or each other. The agent receives sensor
-data about the time, the position and velocity of the cart, and the angles and
+data about the time, the position and velocity of the cart, the angles and
 angular velocity of the pole, and the position and velocity of the objects. The agent
 also receives feedback about their current performance and an optional image. The
 cart, pole and objects have different random starting states each episode. An episode ends
@@ -30,6 +31,10 @@ if the cart moves too far from center, the absolute pole angle is too large,
 or a time limit is exceeded. The time limit is 200 ticks of the game, where each tick
 corresponds to 0.02 seconds. The agent's final score is T/200, where T the number of
 ticks they keep the pole balanced.
+
+The graphic below provides more information about the geometry used in CartPole.
+
+![CartPole Geometry](cartpolepp.png)
 
 See the [cartpole.json](cartpole.json) file for a precise specification of the
 domain, including ranges on sensor values.
@@ -152,6 +157,32 @@ also called Mock novelties. These are described below.
 
 The implementations of these mock novelties can be found in the folder
 [WSU-Portable-Generator/source/partial_env_generator/envs/cartpolepp](https://github.com/holderlb/WSU-SAILON-NG/tree/master/WSU-Portable-Generator/source/partial_env_generator/envs/cartpolepp).
+
+<a name="phase1revealednovelty">
+
+## Phase 1 Revealed Novelty
+
+<img src="phase1.png" width="600">
+    
+* All:
+    * Action space limited to two actions ['left', 'right', 'nothing']. Other actions get mapped to 'nothing'.
+    * Most sensors are set to a fixed value since the information is no longer available.
+    
+* Level 1 (Class): Increase length of pole
+  * No Novelty: length=0.5
+  * Easy: length=2
+  * Medium: length=4
+  * Hard: length=7
+* Level 2 (Attribute): Increase friction between cart and track
+  * No Novelty: friction=0
+  * Easy: friction=0.0125
+  * Medium: friction varies randomly from 0.0125 to 0.1 based on current zone (x pos)
+  * Hard: friction=0.0125, but works in reverse, effectively increasing push force
+* Level 3 (Representation): Decrease sensor precision
+  * No Novelty: Maximum floating point precision
+  * Easy: Each sensor value mapped to 1 of 10 buckets over sensor's range
+  * Medium: Each sensor value mapped to 1 of 6 buckets over sensor's range
+  * Hard: Each sensor value mapped to 1 of 3 buckets over sensor's range
 
 <a name="faq">
 

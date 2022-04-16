@@ -35,7 +35,7 @@ import types
 import uuid
 
 __major_version__ = '0.7'
-__minor_version__ = '6'
+__minor_version__ = '9'
 __db_version__ = '0.5'
 __version__ = '{}.{}'.format(__major_version__, __minor_version__)
 __database_version__ = re.sub('[.]', '_', __db_version__)
@@ -210,6 +210,7 @@ DEFAULT_TA1_LOGFILE = None
 DEFAULT_TA1_SAVE_EXPERIMENT_JSON = False
 DEFAULT_TA1_LOAD_EXPERIMENT_JSON = False
 DEFAULT_TA1_JSON_EXPERIMENT_FILE = 'config/experiment_file.json'
+DEFAULT_TA1_SLEEP_WINDOW = 1.0
 
 # CASAS object strings
 CASAS_ERROR = 'casas_error'
@@ -3868,7 +3869,7 @@ class RequestExperiment(AiqObject):
     def __init__(self, model: Model, novelty: int, novelty_visibility: int, client_rpc_queue: str,
                  git_version: str, experiment_type: str, seed: int = None,
                  domain_dict: dict = None, epoch: float = None, no_testing: bool = False,
-                 description: str = None):
+                 description: str = None, generator_config: dict = None):
         super().__init__()
         self.obj_type = REQ_EXPERIMENT
         self.model = copy.deepcopy(model)
@@ -3899,6 +3900,7 @@ class RequestExperiment(AiqObject):
         if not true_domain:
             raise AiqDataException('An experiment MUST have at least one domain selected.')
         self.description = description
+        self.generator_config = copy.deepcopy(generator_config)
         return
 
     def get_json_obj(self):
@@ -3913,13 +3915,15 @@ class RequestExperiment(AiqObject):
                'epoch': self.epoch,
                'no_testing': self.no_testing,
                'experiment_type': self.experiment_type,
-               'description': self.description}
+               'description': self.description,
+               'generator_config': self.generator_config}
         return copy.deepcopy(obj)
 
 
 class RequestExperimentTrials(RequestExperiment):
     def __init__(self, model: Model, experiment_secret: str, client_rpc_queue: str,
-                 just_one_trial: bool = False, epoch: float = None, domain_dict: dict = None):
+                 just_one_trial: bool = False, epoch: float = None, domain_dict: dict = None,
+                 generator_config: dict = None):
         super().__init__(model=model,
                          novelty=0,
                          novelty_visibility=0,
@@ -3927,7 +3931,8 @@ class RequestExperimentTrials(RequestExperiment):
                          git_version=__version__,
                          experiment_type=TYPE_EXPERIMENT_SAIL_ON,
                          domain_dict=domain_dict,
-                         epoch=epoch)
+                         epoch=epoch,
+                         generator_config=generator_config)
         self.obj_type = REQ_EXP_TRIALS
         self.model = copy.deepcopy(model)
         self.experiment_secret = experiment_secret
@@ -3945,7 +3950,8 @@ class RequestExperimentTrials(RequestExperiment):
                'client_rpc_queue': self.client_rpc_queue,
                'just_one_trial': self.just_one_trial,
                'domain_dict': self.domain_dict,
-               'epoch': self.epoch}
+               'epoch': self.epoch,
+               'generator_config': self.generator_config}
         return copy.deepcopy(obj)
 
 
@@ -4832,7 +4838,7 @@ class GeneratorReset(AiqObject):
 class StartGenerator(AiqObject):
     def __init__(self, domain: str, novelty: int, difficulty: str, seed: int, server_rpc_queue: str,
                  trial_novelty: int, epoch: float = None, day_offset: int = 0,
-                 request_timeout: int = 20, use_image: bool = False):
+                 request_timeout: int = 20, use_image: bool = False, generator_config: dict = None):
         super().__init__()
         self.obj_type = START_GENERATOR
         if domain not in VALID_DOMAINS:
@@ -4855,6 +4861,7 @@ class StartGenerator(AiqObject):
         self.day_offset = day_offset
         self.request_timeout = request_timeout
         self.use_image = use_image
+        self.generator_config = copy.deepcopy(generator_config)
         return
 
     def get_json_obj(self):
@@ -4868,7 +4875,8 @@ class StartGenerator(AiqObject):
                'epoch': self.epoch,
                'day_offset': self.day_offset,
                'request_timeout': self.request_timeout,
-               'use_image': self.use_image}
+               'use_image': self.use_image,
+               'generator_config': self.generator_config}
         return copy.deepcopy(obj)
 
 
@@ -5102,13 +5110,15 @@ def build_routing_key(action=EVENT, sensor_type='*', package_type='*', site='*',
     return routing_key
 
 
-def build_objects_from_json(message):
+def build_objects_from_json(message, amqp_obj=None):
     """This function converts a string message into a list of casas.objects.
 
     Parameters
     ----------
     message : str
         A string of a JSON list containing dictionaries.
+    amqp_obj : object (optional)
+        A rabbitmq.py Connection object to help keep things alive during large objects.
 
     Returns
     -------
@@ -5193,7 +5203,8 @@ def build_objects_from_json(message):
                     epoch = None
                     if 'model' in obj:
                         model = get_subobject(casas_object=obj['model'],
-                                              errormsgs=errormsgs)
+                                              errormsgs=errormsgs,
+                                              amqp_obj=amqp_obj)
                     else:
                         errormsgs.append('Could not obtain attribute model, '
                                          'please include json attribute model.')
@@ -5224,6 +5235,8 @@ def build_objects_from_json(message):
                     if 'description' not in obj:
                         errormsgs.append('Could not obtain attribute description, '
                                          'please include json attribute description.')
+                    if 'generator_config' not in obj:
+                        obj['generator_config'] = None
                     if 'epoch' in obj:
                         epoch = obj['epoch']
                     if len(errormsgs) == 0:
@@ -5237,13 +5250,15 @@ def build_objects_from_json(message):
                                                    domain_dict=obj['domain_dict'],
                                                    epoch=epoch,
                                                    no_testing=obj['no_testing'],
-                                                   description=obj['description'])
+                                                   description=obj['description'],
+                                                   generator_config=obj['generator_config'])
                 elif obj['obj_type'] == REQ_EXP_TRIALS:
                     model = None
                     epoch = None
                     if 'model' in obj:
                         model = get_subobject(casas_object=obj['model'],
-                                              errormsgs=errormsgs)
+                                              errormsgs=errormsgs,
+                                              amqp_obj=amqp_obj)
                     else:
                         errormsgs.append('Could not obtain attribute model, '
                                          'please include json attribute model.')
@@ -5259,6 +5274,8 @@ def build_objects_from_json(message):
                     if 'domain_dict' not in obj:
                         errormsgs.append('Could not obtain attribute domain_dict, '
                                          'please include json attribute domain_dict.')
+                    if 'generator_config' not in obj:
+                        obj['generator_config'] = None
                     if 'epoch' in obj:
                         epoch = obj['epoch']
                     if len(errormsgs) == 0:
@@ -5268,7 +5285,8 @@ def build_objects_from_json(message):
                             client_rpc_queue=obj['client_rpc_queue'],
                             just_one_trial=obj['just_one_trial'],
                             domain_dict=obj['domain_dict'],
-                            epoch=epoch)
+                            epoch=epoch,
+                            generator_config=obj['generator_config'])
                 elif obj['obj_type'] == EXPERIMENT_RESP:
                     if 'server_rpc_queue' not in obj:
                         errormsgs.append('Could not obtain attribute server_rpc_queue, '
@@ -5728,7 +5746,8 @@ def build_objects_from_json(message):
                         if len(obj['episodes']) > 0:
                             episodes = get_subobject_list(
                                 casas_object=json.dumps(obj['episodes']),
-                                errormsgs=errormsgs)
+                                errormsgs=errormsgs,
+                                amqp_obj=amqp_obj)
                     if len(errormsgs) == 0:
                         result = Training(episodes=episodes)
                 elif obj['obj_type'] == OBJ_TRIAL:
@@ -5749,7 +5768,8 @@ def build_objects_from_json(message):
                         if len(obj['episodes']) > 0:
                             episodes = get_subobject_list(
                                 casas_object=json.dumps(obj['episodes']),
-                                errormsgs=errormsgs)
+                                errormsgs=errormsgs,
+                                amqp_obj=amqp_obj)
                     if len(errormsgs) == 0:
                         result = Trial(episodes=episodes,
                                        novelty=obj['novelty'],
@@ -5764,7 +5784,8 @@ def build_objects_from_json(message):
                         if len(obj['trials']) > 0:
                             trials = get_subobject_list(
                                 casas_object=json.dumps(obj['trials']),
-                                errormsgs=errormsgs)
+                                errormsgs=errormsgs,
+                                amqp_obj=amqp_obj)
                     if len(errormsgs) == 0:
                         result = NoveltyGroup(trials=trials)
                 elif obj['obj_type'] == OBJ_EXPERIMENT:
@@ -5782,12 +5803,14 @@ def build_objects_from_json(message):
                     if len(errormsgs) == 0:
                         training = get_subobject(
                             casas_object='[{}]'.format(json.dumps(obj['training'])),
-                            errormsgs=errormsgs)
+                            errormsgs=errormsgs,
+                            amqp_obj=amqp_obj)
                     if len(errormsgs) == 0:
                         if len(obj['novelty_groups']) > 0:
                             nov_groups = get_subobject_list(
                                 casas_object=json.dumps(obj['novelty_groups']),
-                                errormsgs=errormsgs)
+                                errormsgs=errormsgs,
+                                amqp_obj=amqp_obj)
                     if len(errormsgs) == 0:
                         result = Experiment(training=training,
                                             novelty_groups=nov_groups,
@@ -5849,6 +5872,8 @@ def build_objects_from_json(message):
                     if 'use_image' not in obj:
                         errormsgs.append('Could not obtain attribute use_image, '
                                          'please include json attribute use_image.')
+                    if 'generator_config' not in obj:
+                        obj['generator_config'] = None
                     if len(errormsgs) == 0:
                         result = StartGenerator(domain=obj['domain'],
                                                 novelty=obj['novelty'],
@@ -5859,7 +5884,8 @@ def build_objects_from_json(message):
                                                 epoch=obj['epoch'],
                                                 day_offset=obj['day_offset'],
                                                 request_timeout=obj['request_timeout'],
-                                                use_image=obj['use_image'])
+                                                use_image=obj['use_image'],
+                                                generator_config=obj['generator_config'])
                 elif obj['obj_type'] == GENERATOR_RESPONSE:
                     if 'generator_rpc_queue' not in obj:
                         errormsgs.append('Could not obtain attribute generator_rpc_queue, '
@@ -5941,7 +5967,8 @@ def build_objects_from_json(message):
                                              'please include json attribute data->object_list.')
                     if len(errormsgs) == 0:
                         object_list = build_objects_from_json(
-                            message=json.dumps(obj['data']['object_list']))
+                            message=json.dumps(obj['data']['object_list']),
+                            amqp_obj=amqp_obj)
                         if len(object_list) > 0:
                             if not isinstance(object_list, CasasResponse):
                                 for object_list_item in object_list:
@@ -7033,10 +7060,12 @@ def build_objects_from_json(message):
     return return_objects
 
 
-def get_subobject(casas_object, errormsgs):
+def get_subobject(casas_object, errormsgs, amqp_obj=None):
+    if amqp_obj is not None:
+        amqp_obj.process_data_events()
     log.debug("get_subobject( {} )".format(str(casas_object)))
     new_object = None
-    values = build_objects_from_json(casas_object)
+    values = build_objects_from_json(casas_object, amqp_obj=amqp_obj)
     if isinstance(values, list):
         if len(values) > 0:
             new_object = values[0]
@@ -7050,10 +7079,12 @@ def get_subobject(casas_object, errormsgs):
     return new_object
 
 
-def get_subobject_list(casas_object, errormsgs):
+def get_subobject_list(casas_object, errormsgs, amqp_obj=None):
+    if amqp_obj is not None:
+        amqp_obj.process_data_events()
     log.debug("get_subobject( {} )".format(str(casas_object)))
     new_object_list = list()
-    values = build_objects_from_json(casas_object)
+    values = build_objects_from_json(casas_object, amqp_obj=amqp_obj)
     valid = False
     if isinstance(values, list):
         if len(values) > 0:
