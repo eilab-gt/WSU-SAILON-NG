@@ -477,7 +477,7 @@ class TA2Agent(TA2Logic):
         # novelty_threshold = 0.8
         # novelty = random.choice(list(range(4)))
         # novelty_characterization = dict()
-        self.log.info("NOVELTY INFO: %s, %s, %s, %s", (self.novelty_probability, self.threshold, self.novelty, self.characterization))
+        #self.log.info("NOVELTY INFO: %s, %s, %s, %s", (self.novelty_probability, self.threshold, self.novelty, self.characterization))
         return self.novelty_probability, self.threshold, self.novelty, self.characterization
 
     def testing_end(self):
